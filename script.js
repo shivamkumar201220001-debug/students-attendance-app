@@ -4,20 +4,36 @@ const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxEdtjXSBGfPBmFgmAY
 
 // 👇 Class list define karo
 const classList = [
-    "8th", "9th 1st", "9th 2nd", "10th 1st", "10th 2nd",
-    "11th JEE Morning", "11th JEE Evening", "11th NEET Morning", "11th NEET Evening",
-    "12th JEE Morning", "12th JEE Evening", "12th NEET Morning", "12th NEET Evening",
-    "Dropper NEET 1.0", "Dropper NEET 2.0", "Dropper JEE"
+   const classMap = {
+  "8th": "Class 8",
+  "9th 1st": "Class 9-1st",
+  "9th 2nd": "Class 9-2nd",
+  "10th 1st": "Class 10-1st",
+  "10th 2nd": "Class 10-2nd",
+  "11th JEE Morning": "Class 11 JEE Morning",
+  "11th JEE Evening": "Class 11 JEE Evening",
+  "11th NEET Morning": "Class 11 NEET Morning",
+  "11th NEET Evening": "Class 11 NEET Evening",
+  "12th JEE Morning": "Class 12 JEE Morning",
+  "12th JEE Evening": "Class 12 JEE Evening",
+  "12th NEET Morning": "Class 12 NEET Morning",
+  "12th NEET Evening": "Class 12 NEET Evening",
+  "Dropper NEET 1.0": "Class Dropper NEET 1.0",
+  "Dropper NEET 2.0": "Class Dropper NEET 2.0",
+  "Dropper JEE": "Class Dropper JEE"
+};
+
 ];
 
-// 👇 Dropdown populate karo jab page load ho
 const classSelect = document.getElementById("classSelect");
 classSelect.innerHTML = '<option value="">-- Select Class --</option>';
-classList.forEach(cls => {
-    const option = document.createElement("option");
-    option.value = cls;
-    option.textContent = cls;
-    classSelect.appendChild(option);
+Object.keys(classMap).forEach(shortName => {
+  const option = document.createElement("option");
+  option.value = shortName;
+  option.textContent = shortName;
+  classSelect.appendChild(option);
+});
+
 });
 
 // 👇 Class select hone pe student data load karo
