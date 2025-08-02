@@ -1,47 +1,56 @@
 body {
   font-family: Arial, sans-serif;
-  background-color: #f0f4f8;
+  background-color: #f0f8ff;
   margin: 0;
-  padding: 20px;
-  text-align: center;
+  padding: 0;
 }
 
 .container {
   max-width: 900px;
   margin: auto;
-  background: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  padding: 20px;
+  text-align: center;
 }
 
-select {
-  padding: 6px;
-  font-size: 16px;
+h1 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+label, select {
+  font-size: 1rem;
+  margin: 10px 0;
 }
 
 table {
   width: 100%;
-  border-collapse: collapse;
   margin-top: 20px;
-}
-
-table, th, td {
-  border: 1px solid #ddd;
+  border-collapse: collapse;
 }
 
 th, td {
-  padding: 12px;
-  text-align: center;
+  padding: 10px;
+  border: 1px solid #ccc;
 }
 
-#submitBtn {
+select.attendance-select {
+  width: 100px;
+}
+
+button {
   margin-top: 20px;
   padding: 10px 20px;
-  font-size: 16px;
+  font-size: 1rem;
   background-color: #007bff;
-  border: none;
   color: white;
-  border-radius: 5px;
+  border: none;
   cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.hidden {
+  display: none;
 }
