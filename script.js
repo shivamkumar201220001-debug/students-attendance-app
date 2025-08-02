@@ -7,7 +7,7 @@ const studentList = document.getElementById("studentList");
 const studentTableBody = document.getElementById("studentTableBody");
 const attendanceForm = document.getElementById("attendanceForm");
 
-// 📦 Fetch list of class tabs
+// Fetch class tabs
 async function fetchClassTabs() {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}`;
   const res = await fetch(url);
@@ -16,15 +16,17 @@ async function fetchClassTabs() {
   if (data.sheets) {
     data.sheets.forEach(sheet => {
       const sheetName = sheet.properties.title;
-      const option = document.createElement("option");
-      option.value = sheetName;
-      option.textContent = sheetName;
-      classSelect.appendChild(option);
+      if (sheetName !== "Attendance") {  // Exclude Attendance tab
+        const option = document.createElement("option");
+        option.value = sheetName;
+        option.textContent = sheetName;
+        classSelect.appendChild(option);
+      }
     });
   }
 }
 
-// 📄 Fetch students by class tab
+// Fetch students by class
 async function fetchStudents(className) {
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${className}?key=${API_KEY}`;
   const res = await fetch(url);
@@ -32,23 +34,21 @@ async function fetchStudents(className) {
   const rows = data.values;
 
   if (rows && rows.length > 1) {
-    const headers = rows[0];
-    const students = rows.slice(1);
-
     studentTableBody.innerHTML = "";
-    students.forEach(student => {
+    rows.slice(1).forEach(student => {
+      const reg = student[0] || "";
+      const name = student[1] || "";
+      const cls = student[2] || "";
+      const mainClass = student[3] || "";
+
       const row = document.createElement("tr");
-
-      const reg = student[0];
-      const name = student[1];
-      const cls = student[2];
-
       row.innerHTML = `
         <td>${reg}</td>
         <td>${name}</td>
         <td>${cls}</td>
+        <td>${mainClass}</td>
         <td>
-          <select name="attendance" class="attendance-select">
+          <select class="attendance-select">
             <option value="Present">Present</option>
             <option value="Absent">Absent</option>
           </select>
@@ -56,7 +56,6 @@ async function fetchStudents(className) {
       `;
       studentTableBody.appendChild(row);
     });
-
     studentList.classList.remove("hidden");
   } else {
     studentList.classList.add("hidden");
@@ -64,41 +63,56 @@ async function fetchStudents(className) {
   }
 }
 
-// 📤 Submit attendance to Apps Script
+// Submit attendance
 attendanceForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const rows = Array.from(studentTableBody.querySelectorAll("tr"));
-  const attendanceData = rows.map(row => {
-    const reg = row.children[0].textContent;
-    const name = row.children[1].textContent;
-    const cls = row.children[2].textContent;
-    const attendance = row.querySelector("select").value;
-    return { reg, name, cls, attendance };
-  });
+  const attendanceData = rows.map(row => ({
+    reg: row.children[0].textContent,
+    name: row.children[1].textContent,
+    cls: row.children[2].textContent,
+    mainClass: row.children[3].textContent,
+    attendance: row.querySelector("select").value
+  }));
 
   const res = await fetch(WEB_APP_URL, {
     method: "POST",
     body: JSON.stringify(attendanceData),
-    headers: {
-      "Content-Type": "application/json"
-    }
+    headers: { "Content-Type": "application/json" }
   });
 
   if (res.ok) {
-    alert("Attendance submitted successfully!");
+    alert("Attendance submitted!");
   } else {
-    alert("Failed to submit attendance.");
+    alert("Submission failed.");
   }
 });
 
 classSelect.addEventListener("change", () => {
   const selectedClass = classSelect.value;
-  if (selectedClass) {
-    fetchStudents(selectedClass);
-  } else {
-    studentList.classList.add("hidden");
-  }
+  selectedClass ? fetchStudents(selectedClass) : studentList.classList.add("hidden");
 });
 
 fetchClassTabs();
+
+// Add new class
+async function addNewClass() {
+  const newClass = document.getElementById("newClassName").value.trim();
+  if (!newClass) return alert("Enter class name!");
+
+  const res = await fetch(WEB_APP_URL, {
+    method: "POST",
+    body: JSON.stringify({ action: "addClass", className: newClass }),
+    headers: { "Content-Type": "application/json" }
+  });
+
+  if (res.ok) {
+    alert("Class added!");
+    classSelect.innerHTML = '<option value="">-- Choose Class --</option>';
+    fetchClassTabs();
+    document.getElementById("newClassName").value = "";
+  } else {
+    alert("Failed to add class.");
+  }
+}
