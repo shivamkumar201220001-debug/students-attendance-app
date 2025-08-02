@@ -2,9 +2,8 @@ const API_KEY = "AIzaSyCFVED1V4gDZcXeqn6Xsn2MKoSZeFHsaRc";
 const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxEdtjXSBGfPBmFgmAY5uEdsT5VFcfAByBiTLopDj2l/dev";
 
-// 👇 Class list define karo
-const classList = [
-   const classMap = {
+// ✅ Correct class mapping
+const classMap = {
   "8th": "Class 8",
   "9th 1st": "Class 9-1st",
   "9th 2nd": "Class 9-2nd",
@@ -23,8 +22,7 @@ const classList = [
   "Dropper JEE": "Class Dropper JEE"
 };
 
-];
-
+// ✅ Populate classSelect dropdown
 const classSelect = document.getElementById("classSelect");
 classSelect.innerHTML = '<option value="">-- Select Class --</option>';
 Object.keys(classMap).forEach(shortName => {
@@ -34,72 +32,38 @@ Object.keys(classMap).forEach(shortName => {
   classSelect.appendChild(option);
 });
 
-});
-
-// 👇 Class select hone pe student data load karo
+// ✅ Fetch from correct sheet/tab name
 document.getElementById("classSelect").addEventListener("change", function () {
-    const selectedClass = this.value;
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${selectedClass}?key=${API_KEY}`)
-        .then((res) => res.json())
-        .then((data) => {
-            const rows = data.values;
-            if (!rows || rows.length < 2) {
-                document.getElementById("studentsContainer").innerHTML = "<p>No data found.</p>";
-                return;
-            }
+  const selectedClass = this.value;
+  const sheetTab = classMap[selectedClass];  // Convert to actual sheet/tab name
 
-            let html = "<table><tr><th>Reg No</th><th>Name</th><th>Attendance</th></tr>";
-            for (let i = 1; i < rows.length; i++) {
-                const [reg, name] = rows[i];
-                html += `
-                    <tr>
-                        <td>${reg}</td>
-                        <td>${name}</td>
-                        <td>
-                            <select class="attendance" data-reg="${reg}" data-name="${name}">
-                                <option value="Present">Present</option>
-                                <option value="Absent">Absent</option>
-                                <option value="Leave">Leave</option>
-                            </select>
-                        </td>
-                    </tr>`;
-            }
-            html += "</table>";
-            document.getElementById("studentsContainer").innerHTML = html;
-            document.getElementById("submitBtn").style.display = "inline-block";
-        });
-});
+  fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/'${sheetTab}'?key=${API_KEY}`)
+    .then((res) => res.json())
+    .then((data) => {
+      const rows = data.values;
+      if (!rows || rows.length < 2) {
+        document.getElementById("studentsContainer").innerHTML = "<p>No data found.</p>";
+        return;
+      }
 
-// 👇 Submit button par attendance save karo
-document.getElementById("submitBtn").addEventListener("click", () => {
-    const selectedClass = document.getElementById("classSelect").value;
-    const selects = document.querySelectorAll(".attendance");
-
-    let present = 0, absent = 0, leave = 0;
-
-    selects.forEach(select => {
-        const status = select.value;
-        if (status === "Present") present++;
-        if (status === "Absent") absent++;
-        if (status === "Leave") leave++;
-
-        const data = {
-            date: new Date().toLocaleDateString("en-IN"),
-            class: selectedClass,
-            regNo: select.getAttribute("data-reg"),
-            name: select.getAttribute("data-name"),
-            status
-        };
-
-        fetch(WEB_APP_URL, {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: { "Content-Type": "application/json" }
-        });
+      let html = "<table><tr><th>Reg No</th><th>Name</th><th>Attendance</th></tr>";
+      for (let i = 1; i < rows.length; i++) {
+        const [reg, name] = rows[i];
+        html += `
+          <tr>
+            <td>${reg}</td>
+            <td>${name}</td>
+            <td>
+              <select class="attendance" data-reg="${reg}" data-name="${name}">
+                <option value="Present">Present</option>
+                <option value="Absent">Absent</option>
+                <option value="Leave">Leave</option>
+              </select>
+            </td>
+          </tr>`;
+      }
+      html += "</table>";
+      document.getElementById("studentsContainer").innerHTML = html;
+      document.getElementById("submitBtn").style.display = "inline-block";
     });
-
-    document.getElementById("summary").innerText = 
-        `✔️ Present: ${present} | ❌ Absent: ${absent} | 🚫 Leave: ${leave}`;
-
-    alert("Attendance submitted successfully!");
 });
