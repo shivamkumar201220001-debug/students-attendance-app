@@ -22,6 +22,7 @@ const classMap = {
   "Dropper JEE": "Dropper JEE"
 };
 
+
 // ✅ Populate classSelect dropdown
 const classSelect = document.getElementById("classSelect");
 classSelect.innerHTML = '<option value="">-- Select Class --</option>';
@@ -37,8 +38,8 @@ document.getElementById("classSelect").addEventListener("change", function () {
   const selectedClass = this.value;
   const sheetTab = classMap[selectedClass];  // Convert to actual sheet/tab name
 
-  fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${sheetTab}?key=${API_KEY}`)
-    .then((res) => res.json())
+  fetch(https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/'${sheetTab}'?key=${API_KEY})
+  .then((res) => res.json())
     .then((data) => {
       const rows = data.values;
       if (!rows || rows.length < 2) {
@@ -49,7 +50,7 @@ document.getElementById("classSelect").addEventListener("change", function () {
       let html = "<table><tr><th>Reg No</th><th>Name</th><th>Attendance</th></tr>";
       for (let i = 1; i < rows.length; i++) {
         const [reg, name] = rows[i];
-        html += `
+        html += 
           <tr>
             <td>${reg}</td>
             <td>${name}</td>
@@ -60,7 +61,7 @@ document.getElementById("classSelect").addEventListener("change", function () {
                 <option value="Leave">Leave</option>
               </select>
             </td>
-          </tr>`;
+          </tr>;
       }
       html += "</table>";
       document.getElementById("studentsContainer").innerHTML = html;
