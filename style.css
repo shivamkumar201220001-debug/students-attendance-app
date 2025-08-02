@@ -17,6 +17,17 @@ h1 {
   margin-bottom: 20px;
 }
 
+.add-class {
+  margin-bottom: 20px;
+}
+
+.add-class input {
+  padding: 8px;
+  font-size: 1rem;
+  width: 200px;
+  margin-right: 10px;
+}
+
 label, select {
   font-size: 1rem;
   margin: 10px 0;
