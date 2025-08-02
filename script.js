@@ -1,70 +1,47 @@
-const API_KEY = "AIzaSyCFVED1V4gDZcXeqn6Xsn2MKoSZeFHsaRc";
-const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxEdtjXSBGfPBmFgmAY5uEdsT5VFcfAByBiTLopDj2l/dev";
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f4f8;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+}
 
-// ✅ Correct class mapping
-const classMap = {
-  "8th": "8th",
-  "9th 1st": "9th 1st",
-  "9th 2nd": "9th 2nd",
-  "10th 1st": "10th 1st",
-  "10th 2nd": "10th 2nd",
-  "11th JEE Morning": "11th JEE Morning",
-  "11th JEE Evening": "11th JEE Evening",
-  "11th NEET Morning": "11th NEET Morning",
-  "11th NEET Evening": "11th NEET Evening",
-  "12th JEE Morning": "12th JEE Morning",
-  "12th JEE Evening": "12th JEE Evening",
-  "12th NEET Morning": "12th NEET Morning",
-  "12th NEET Evening": "12th NEET Evening",
-  "Dropper NEET 1.0": "Dropper NEET 1.0",
-  "Dropper NEET 2.0": "Dropper NEET 2.0",
-  "Dropper JEE": "Dropper JEE"
-};
+.container {
+  max-width: 900px;
+  margin: auto;
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
 
+select {
+  padding: 6px;
+  font-size: 16px;
+}
 
-// ✅ Populate classSelect dropdown
-const classSelect = document.getElementById("classSelect");
-classSelect.innerHTML = '<option value="">-- Select Class --</option>';
-Object.keys(classMap).forEach(shortName => {
-  const option = document.createElement("option");
-  option.value = shortName;
-  option.textContent = shortName;
-  classSelect.appendChild(option);
-});
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
 
-// ✅ Fetch from correct sheet/tab name
-document.getElementById("classSelect").addEventListener("change", function () {
-  const selectedClass = this.value;
-  const sheetTab = classMap[selectedClass];  // Convert to actual sheet/tab name
+table, th, td {
+  border: 1px solid #ddd;
+}
 
-  fetch(https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/'${sheetTab}'?key=${API_KEY})
-  .then((res) => res.json())
-    .then((data) => {
-      const rows = data.values;
-      if (!rows || rows.length < 2) {
-        document.getElementById("studentsContainer").innerHTML = "<p>No data found.</p>";
-        return;
-      }
+th, td {
+  padding: 12px;
+  text-align: center;
+}
 
-      let html = "<table><tr><th>Reg No</th><th>Name</th><th>Attendance</th></tr>";
-      for (let i = 1; i < rows.length; i++) {
-        const [reg, name] = rows[i];
-        html += 
-          <tr>
-            <td>${reg}</td>
-            <td>${name}</td>
-            <td>
-              <select class="attendance" data-reg="${reg}" data-name="${name}">
-                <option value="Present">Present</option>
-                <option value="Absent">Absent</option>
-                <option value="Leave">Leave</option>
-              </select>
-            </td>
-          </tr>;
-      }
-      html += "</table>";
-      document.getElementById("studentsContainer").innerHTML = html;
-      document.getElementById("submitBtn").style.display = "inline-block";
-    });
-});
+#submitBtn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
