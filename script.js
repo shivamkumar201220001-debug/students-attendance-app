@@ -22,7 +22,6 @@ const classMap = {
   "Dropper JEE": "Dropper JEE"
 };
 
-
 // ✅ Populate classSelect dropdown
 const classSelect = document.getElementById("classSelect");
 classSelect.innerHTML = '<option value="">-- Select Class --</option>';
@@ -39,7 +38,7 @@ document.getElementById("classSelect").addEventListener("change", function () {
   const sheetTab = classMap[selectedClass];  // Convert to actual sheet/tab name
 
   fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/'${encodeURIComponent(sheetTab)}'?key=${API_KEY}`)
-  .then((res) => res.json())
+    .then((res) => res.json())
     .then((data) => {
       const rows = data.values;
       if (!rows || rows.length < 2) {
