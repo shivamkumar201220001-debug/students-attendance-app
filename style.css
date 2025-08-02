@@ -1,17 +1,23 @@
 body {
   font-family: Arial, sans-serif;
-  background: #f1f1f1;
+  background-color: #f0f4f8;
   margin: 0;
   padding: 20px;
   text-align: center;
 }
 
 .container {
-  max-width: 800px;
+  max-width: 900px;
   margin: auto;
-  background: #fff;
-  padding: 20px;
+  background: white;
+  padding: 30px;
   border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+select {
+  padding: 6px;
+  font-size: 16px;
 }
 
 table {
@@ -20,17 +26,22 @@ table {
   margin-top: 20px;
 }
 
+table, th, td {
+  border: 1px solid #ddd;
+}
+
 th, td {
-  border: 1px solid #ccc;
-  padding: 10px;
+  padding: 12px;
+  text-align: center;
 }
 
-select {
-  padding: 8px;
-  margin: 10px;
-}
-
-#summary {
+#submitBtn {
   margin-top: 20px;
-  font-weight: bold;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  border: none;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
 }
