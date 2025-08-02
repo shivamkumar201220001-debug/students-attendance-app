@@ -1,6 +1,6 @@
 const API_KEY = "AIzaSyCFVED1V4gDZcXeqn6Xsn2MKoSZeFHsaRc";
 const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbypEiRcHxlOL_sKBIoyFGrnhtTBWNUI84VdUv0qqoK5dCpGPSqWKW4VVsHnKb0qxQ0egQ/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxEdtjXSBGfPBmFgmAY5uEdsT5VFcfAByBiTLopDj2l/dev";
 
 document.getElementById("classSelect").addEventListener("change", function () {
   const selectedClass = this.value;
