@@ -38,7 +38,7 @@ document.getElementById("classSelect").addEventListener("change", function () {
   const selectedClass = this.value;
   const sheetTab = classMap[selectedClass];  // Convert to actual sheet/tab name
 
-  fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/'${sheetTab}'?key=${API_KEY}`)
+  fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/'${encodeURIComponent(sheetTab)}'?key=${API_KEY}`)
   .then((res) => res.json())
     .then((data) => {
       const rows = data.values;
