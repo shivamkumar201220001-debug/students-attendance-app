@@ -10,7 +10,7 @@ const submitBtn = document.getElementById("submitBtn");
 const classes = [
     "8th", "9th 1st", "9th 2nd", "10th 1st", "10th 2nd", 
     "11th JEE Morning", "11th JEE Evening", "11th NEET Morning", "11th NEET Evening", 
-    "12th JEE Morning", "12th JEE Evening", "12th NEET Morning", "12th NEET Evening"
+    "12th JEE Morning", "12th JEE Evening", "12th NEET Morning", "12th NEET Evening", "Drooper NEET", "Dropper NEET 2.0", 
 ];
 
 classes.forEach(className => {
