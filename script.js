@@ -6,18 +6,19 @@ const classSelect = document.getElementById("classSelect");
 const studentsTable = document.getElementById("studentsTable").getElementsByTagName("tbody")[0];
 const submitBtn = document.getElementById("submitBtn");
 
-// ✅ Load sheet names as class options
-fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}`)
-    .then(res => res.json())
-    .then(data => {
-        const sheets = data.sheets.map(sheet => sheet.properties.title);
-        sheets.forEach(sheetName => {
-            const option = document.createElement("option");
-            option.value = sheetName;
-            option.textContent = sheetName;
-            classSelect.appendChild(option);
-        });
-    });
+// ✅ Static class list
+const classes = [
+    "8th", "9th 1st", "9th 2nd", "10th 1st", "10th 2nd", 
+    "11th JEE Morning", "11th JEE Evening", "11th NEET Morning", "11th NEET Evening", 
+    "12th JEE Morning", "12th JEE Evening", "12th NEET Morning", "12th NEET Evening"
+];
+
+classes.forEach(className => {
+    const option = document.createElement("option");
+    option.value = className;
+    option.textContent = className;
+    classSelect.appendChild(option);
+});
 
 classSelect.addEventListener("change", () => {
     const className = classSelect.value;
@@ -25,7 +26,6 @@ classSelect.addEventListener("change", () => {
 
     studentsTable.innerHTML = ""; // Clear table
 
-    // ✅ encode sheet name
     fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(className)}?key=${API_KEY}`)
         .then(res => res.json())
         .then(data => {
