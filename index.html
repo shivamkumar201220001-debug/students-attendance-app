@@ -4,38 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Students Attendance App</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        select, input[type="date"], button { padding: 8px; margin: 5px; }
+    </style>
 </head>
 <body>
-    <h1>Students Attendance</h1>
+    <h1>Students Attendance App</h1>
 
-    <div class="container">
+    <label for="attendanceDate">Select Date:</label>
+    <input type="date" id="attendanceDate">
 
-        <!-- ✅ Class Dropdown -->
-        <label for="classSelect">Select Class:</label>
-        <select id="classSelect">
-            <option value="">-- Select Class --</option>
-        </select>
+    <br><br>
 
-        <!-- ✅ Date Picker -->
-        <label for="attendanceDate" style="margin-left: 15px;">Select Date:</label>
-        <input type="date" id="attendanceDate">
+    <label for="classSelect">Select Class:</label>
+    <select id="classSelect">
+        <option value="">--Select Class--</option>
+    </select>
 
-        <!-- Students Table -->
-        <table id="studentsTable">
-            <thead>
-                <tr>
-                    <th>Reg. No</th>
-                    <th>Student Name</th>
-                    <th>Attendance</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+    <table id="studentsTable">
+        <thead>
+            <tr>
+                <th>Reg. No</th>
+                <th>Student Name</th>
+                <th>Attendance</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
-        <!-- Submit Button -->
-        <button id="submitBtn">Submit Attendance</button>
-    </div>
+    <button id="submitBtn">Submit Attendance</button>
 
     <script src="script.js"></script>
 </body>
