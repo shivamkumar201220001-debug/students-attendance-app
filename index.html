@@ -10,13 +10,18 @@
     <h1>Students Attendance</h1>
 
     <div class="container">
+
+        <!-- ✅ Class Dropdown -->
         <label for="classSelect">Select Class:</label>
         <select id="classSelect">
             <option value="">-- Select Class --</option>
         </select>
-        <label for="attendanceDate">Select Date:</label>
-    <input type="date" id="attendanceDate">
-</div>
+
+        <!-- ✅ Date Picker -->
+        <label for="attendanceDate" style="margin-left: 15px;">Select Date:</label>
+        <input type="date" id="attendanceDate">
+
+        <!-- Students Table -->
         <table id="studentsTable">
             <thead>
                 <tr>
@@ -28,6 +33,7 @@
             <tbody></tbody>
         </table>
 
+        <!-- Submit Button -->
         <button id="submitBtn">Submit Attendance</button>
     </div>
 
