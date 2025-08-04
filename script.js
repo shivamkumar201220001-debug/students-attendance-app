@@ -6,7 +6,7 @@ const classSelect = document.getElementById("classSelect");
 const studentsTable = document.getElementById("studentsTable").getElementsByTagName("tbody")[0];
 const submitBtn = document.getElementById("submitBtn");
 
-// Load sheet names as class options
+// ✅ Load sheet names as class options
 fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}`)
     .then(res => res.json())
     .then(data => {
@@ -25,7 +25,8 @@ classSelect.addEventListener("change", () => {
 
     studentsTable.innerHTML = ""; // Clear table
 
-    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${className}?key=${API_KEY}`)
+    // ✅ encode sheet name
+    fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(className)}?key=${API_KEY}`)
         .then(res => res.json())
         .then(data => {
             const rows = data.values;
