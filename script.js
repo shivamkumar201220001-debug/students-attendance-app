@@ -1,105 +1,89 @@
-const API_KEY = "AIzaSyCFVED1V4gDZcXeqn6Xsn2MKoSZeFHsaRc";
-const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzs8TlZRx2jGbiKc5_wQKHGp3yVsL1WKmp0kqAVrOizhvAP3W8cUO8VqktYnhv3cAXPUg/exec";
-
-const classTabs = ["6th", "7th", "8th"]; // Add more if needed
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzEML8aNVv-ePKjfFkuqG_A8wS82xwg5vvL9UOGiNC8lxX01b_WlCRI2bN-nSwLEGfJTw/exec";
 
 const classSelect = document.getElementById("classSelect");
 const studentsTableBody = document.querySelector("#studentsTable tbody");
 const submitBtn = document.getElementById("submitBtn");
+
 const attendanceDate = document.getElementById("attendanceDate");
 
-// ✅ Populate Class Dropdown
-classTabs.forEach(cls => {
+// Add your class names here
+const classes = [
+  "8th", "9th 1st", "9th 2nd", "10th 1st", "10th 2nd",
+  "11th JEE Morning", "11th JEE Evening", "11th NEET Morning", "11th NEET Evening",
+  "12th JEE Morning", "12th JEE Evening", "12th NEET Morning", "12th NEET Evening",
+  "Dropper NEET", "Dropper NEET 2.0"
+];
+
+classes.forEach(cls => {
   const option = document.createElement("option");
   option.value = cls;
   option.textContent = cls;
   classSelect.appendChild(option);
 });
 
-// ✅ Load Students When Class Selected
-classSelect.addEventListener("change", () => {
+classSelect.addEventListener("change", async () => {
   const selectedClass = classSelect.value;
   if (!selectedClass) return;
 
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${selectedClass}?key=${API_KEY}`;
+  const res = await fetch(`${WEB_APP_URL}?className=${encodeURIComponent(selectedClass)}`);
+  const data = await res.json();
 
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      studentsTableBody.innerHTML = "";
+  studentsTableBody.innerHTML = "";
 
-      const rows = data.values;
-      if (!rows || rows.length < 2) {
-        studentsTableBody.innerHTML = "<tr><td colspan='3'>No data found</td></tr>";
-        return;
-      }
+  data.forEach(student => {
+    const tr = document.createElement("tr");
 
-      rows.slice(1).forEach(row => {
-        const [regNo, name] = row;
+    tr.innerHTML = `
+      <td>${student.reg}</td>
+      <td>${student.name}</td>
+      <td>
+        <select>
+          <option value="Present">Present</option>
+          <option value="Absent">Absent</option>
+        </select>
+      </td>
+    `;
 
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${regNo}</td>
-          <td>${name}</td>
-          <td>
-            <select>
-              <option value="Present">Present</option>
-              <option value="Absent">Absent</option>
-            </select>
-          </td>
-        `;
-        studentsTableBody.appendChild(tr);
-      });
-    })
-    .catch(err => {
-      console.error("Fetch error:", err);
-      studentsTableBody.innerHTML = "<tr><td colspan='3'>Error loading data</td></tr>";
-    });
+    studentsTableBody.appendChild(tr);
+  });
 });
 
-// ✅ Submit Attendance to Web App
-submitBtn.addEventListener("click", () => {
-  const selectedDate = attendanceDate.value;
+submitBtn.addEventListener("click", async () => {
   const selectedClass = classSelect.value;
+  const selectedDate = attendanceDate.value;
 
-  if (!selectedDate || !selectedClass) {
-    alert("Please select both date and class.");
+  if (!selectedClass || !selectedDate) {
+    alert("Please select class and date.");
     return;
   }
 
-  const attendanceData = [];
   const rows = studentsTableBody.querySelectorAll("tr");
+  const attendanceData = [];
 
   rows.forEach(row => {
-    const regNo = row.cells[0].textContent;
-    const name = row.cells[1].textContent;
-    const attendance = row.cells[2].querySelector("select").value;
+    const regNo = row.children[0].textContent;
+    const name = row.children[1].textContent;
+    const attendance = row.children[2].querySelector("select").value;
 
     attendanceData.push({
-      date: selectedDate,
-      class: selectedClass,
-      regNo: regNo,
+      cls: selectedClass,
+      reg: regNo,
       name: name,
       attendance: attendance
     });
   });
 
-  // Send to Google Apps Script
-  fetch(WEB_APP_URL, {
-    method: "POST",
-    body: JSON.stringify(attendanceData),
-    headers: {
-      "Content-Type": "application/json"
-    }
-  })
-    .then(res => res.text())
-    .then(response => {
-      alert("Attendance submitted successfully!");
-      console.log(response);
-    })
-    .catch(err => {
-      alert("Error submitting attendance.");
-      console.error(err);
+  try {
+    const res = await fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify(attendanceData),
+      headers: { "Content-Type": "application/json" }
     });
+
+    const text = await res.text();
+    alert(text);
+  } catch (err) {
+    console.error(err);
+    alert("Error submitting attendance.");
+  }
 });
