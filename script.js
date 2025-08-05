@@ -1,89 +1,105 @@
+const API_KEY = "AIzaSyCFVED1V4gDZcXeqn6Xsn2MKoSZeFHsaRc";
+const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzEML8aNVv-ePKjfFkuqG_A8wS82xwg5vvL9UOGiNC8lxX01b_WlCRI2bN-nSwLEGfJTw/exec";
+
+const classTabs = ["6th", "7th", "8th"]; // Add more if needed
 
 const classSelect = document.getElementById("classSelect");
 const studentsTableBody = document.querySelector("#studentsTable tbody");
 const submitBtn = document.getElementById("submitBtn");
-
 const attendanceDate = document.getElementById("attendanceDate");
 
-// Add your class names here
-const classes = [
-  "8th", "9th 1st", "9th 2nd", "10th 1st", "10th 2nd",
-  "11th JEE Morning", "11th JEE Evening", "11th NEET Morning", "11th NEET Evening",
-  "12th JEE Morning", "12th JEE Evening", "12th NEET Morning", "12th NEET Evening",
-  "Dropper NEET", "Dropper NEET 2.0"
-];
-
-classes.forEach(cls => {
+// ✅ Populate Class Dropdown
+classTabs.forEach(cls => {
   const option = document.createElement("option");
   option.value = cls;
   option.textContent = cls;
   classSelect.appendChild(option);
 });
 
-classSelect.addEventListener("change", async () => {
+// ✅ Load Students When Class Selected
+classSelect.addEventListener("change", () => {
   const selectedClass = classSelect.value;
   if (!selectedClass) return;
 
-  const res = await fetch(`${WEB_APP_URL}?className=${encodeURIComponent(selectedClass)}`);
-  const data = await res.json();
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${selectedClass}?key=${API_KEY}`;
 
-  studentsTableBody.innerHTML = "";
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      studentsTableBody.innerHTML = "";
 
-  data.forEach(student => {
-    const tr = document.createElement("tr");
+      const rows = data.values;
+      if (!rows || rows.length < 2) {
+        studentsTableBody.innerHTML = "<tr><td colspan='3'>No data found</td></tr>";
+        return;
+      }
 
-    tr.innerHTML = `
-      <td>${student.reg}</td>
-      <td>${student.name}</td>
-      <td>
-        <select>
-          <option value="Present">Present</option>
-          <option value="Absent">Absent</option>
-        </select>
-      </td>
-    `;
+      rows.slice(1).forEach(row => {
+        const [regNo, name] = row;
 
-    studentsTableBody.appendChild(tr);
-  });
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${regNo}</td>
+          <td>${name}</td>
+          <td>
+            <select>
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+            </select>
+          </td>
+        `;
+        studentsTableBody.appendChild(tr);
+      });
+    })
+    .catch(err => {
+      console.error("Fetch error:", err);
+      studentsTableBody.innerHTML = "<tr><td colspan='3'>Error loading data</td></tr>";
+    });
 });
 
-submitBtn.addEventListener("click", async () => {
-  const selectedClass = classSelect.value;
+// ✅ Submit Attendance to Web App
+submitBtn.addEventListener("click", () => {
   const selectedDate = attendanceDate.value;
+  const selectedClass = classSelect.value;
 
-  if (!selectedClass || !selectedDate) {
-    alert("Please select class and date.");
+  if (!selectedDate || !selectedClass) {
+    alert("Please select both date and class.");
     return;
   }
 
-  const rows = studentsTableBody.querySelectorAll("tr");
   const attendanceData = [];
+  const rows = studentsTableBody.querySelectorAll("tr");
 
   rows.forEach(row => {
-    const regNo = row.children[0].textContent;
-    const name = row.children[1].textContent;
-    const attendance = row.children[2].querySelector("select").value;
+    const regNo = row.cells[0].textContent;
+    const name = row.cells[1].textContent;
+    const attendance = row.cells[2].querySelector("select").value;
 
     attendanceData.push({
-      cls: selectedClass,
-      reg: regNo,
+      date: selectedDate,
+      class: selectedClass,
+      regNo: regNo,
       name: name,
       attendance: attendance
     });
   });
 
-  try {
-    const res = await fetch(WEB_APP_URL, {
-      method: "POST",
-      body: JSON.stringify(attendanceData),
-      headers: { "Content-Type": "application/json" }
+  // Send to Google Apps Script
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    body: JSON.stringify(attendanceData),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+    .then(res => res.text())
+    .then(response => {
+      alert("Attendance submitted successfully!");
+      console.log(response);
+    })
+    .catch(err => {
+      alert("Error submitting attendance.");
+      console.error(err);
     });
-
-    const text = await res.text();
-    alert(text);
-  } catch (err) {
-    console.error(err);
-    alert("Error submitting attendance.");
-  }
 });
