@@ -1,30 +1,52 @@
 body {
     font-family: Arial, sans-serif;
-    text-align: center;
     background-color: #f4f4f4;
-    padding: 20px;
+    text-align: center;
+    margin: 0;
+    padding: 0;
 }
 
 h1 {
-    color: #333;
+    background-color: #0077cc;
+    color: white;
+    padding: 20px 0;
+    margin: 0;
 }
 
-#classSelect, #submitBtn {
+.container {
+    padding: 20px;
+    max-width: 800px;
+    margin: auto;
+}
+
+select, button {
     padding: 10px;
-    margin: 10px;
+    margin: 10px 0;
     font-size: 16px;
 }
 
-.student {
-    margin: 10px;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    display: inline-block;
-    width: 200px;
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
 }
 
-.student label {
-    display: block;
-    margin-top: 5px;
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+button {
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #005fa3;
 }
