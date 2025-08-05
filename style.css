@@ -1,52 +1,30 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
     text-align: center;
-    margin: 0;
-    padding: 0;
+    background-color: #f4f4f4;
+    padding: 20px;
 }
 
 h1 {
-    background-color: #0077cc;
-    color: white;
-    padding: 20px 0;
-    margin: 0;
+    color: #333;
 }
 
-.container {
-    padding: 20px;
-    max-width: 800px;
-    margin: auto;
-}
-
-select, button {
+#classSelect, #submitBtn {
     padding: 10px;
-    margin: 10px 0;
+    margin: 10px;
     font-size: 16px;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
-}
-
-table, th, td {
-    border: 1px solid #ddd;
-}
-
-th, td {
+.student {
+    margin: 10px;
     padding: 10px;
-    text-align: center;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    display: inline-block;
+    width: 200px;
 }
 
-button {
-    background-color: #0077cc;
-    color: white;
-    border: none;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #005fa3;
+.student label {
+    display: block;
+    margin-top: 5px;
 }
