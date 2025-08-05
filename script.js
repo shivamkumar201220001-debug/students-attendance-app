@@ -1,105 +1,58 @@
-const API_KEY = "AIzaSyCFVED1V4gDZcXeqn6Xsn2MKoSZeFHsaRc";
-const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzFn5j0zsUAa3e_LJIfqyry6Ex6dx3OLfAmQBQky46O5YA583qtinABkKOxnTOisy7AhQ/exec";
+const WEB_APP_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
 
-const classTabs = ["6th", "7th", "8th"]; // Add more if needed
-
-const classSelect = document.getElementById("classSelect");
-const studentsTableBody = document.querySelector("#studentsTable tbody");
-const submitBtn = document.getElementById("submitBtn");
-const attendanceDate = document.getElementById("attendanceDate");
-
-// ✅ Populate Class Dropdown
-classTabs.forEach(cls => {
-  const option = document.createElement("option");
-  option.value = cls;
-  option.textContent = cls;
-  classSelect.appendChild(option);
-});
-
-// ✅ Load Students When Class Selected
-classSelect.addEventListener("change", () => {
-  const selectedClass = classSelect.value;
-  if (!selectedClass) return;
-
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${selectedClass}?key=${API_KEY}`;
-
-  fetch(url)
-    .then(res => res.json())
-    .then(data => {
-      studentsTableBody.innerHTML = "";
-
-      const rows = data.values;
-      if (!rows || rows.length < 2) {
-        studentsTableBody.innerHTML = "<tr><td colspan='3'>No data found</td></tr>";
-        return;
-      }
-
-      rows.slice(1).forEach(row => {
-        const [regNo, name] = row;
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${regNo}</td>
-          <td>${name}</td>
-          <td>
-            <select>
-              <option value="Present">Present</option>
-              <option value="Absent">Absent</option>
-            </select>
-          </td>
-        `;
-        studentsTableBody.appendChild(tr);
-      });
-    })
-    .catch(err => {
-      console.error("Fetch error:", err);
-      studentsTableBody.innerHTML = "<tr><td colspan='3'>Error loading data</td></tr>";
-    });
-});
-
-// ✅ Submit Attendance to Web App
-submitBtn.addEventListener("click", () => {
-  const selectedDate = attendanceDate.value;
-  const selectedClass = classSelect.value;
-
-  if (!selectedDate || !selectedClass) {
-    alert("Please select both date and class.");
-    return;
-  }
-
-  const attendanceData = [];
-  const rows = studentsTableBody.querySelectorAll("tr");
-
-  rows.forEach(row => {
-    const regNo = row.cells[0].textContent;
-    const name = row.cells[1].textContent;
-    const attendance = row.cells[2].querySelector("select").value;
-
-    attendanceData.push({
-      date: selectedDate,
-      class: selectedClass,
-      regNo: regNo,
-      name: name,
-      attendance: attendance
-    });
-  });
-
-  // Send to Google Apps Script
-  fetch(WEB_APP_URL, {
-    method: "POST",
-    body: JSON.stringify(attendanceData),
-    headers: {
-      "Content-Type": "application/json"
+document.getElementById("classSelect").addEventListener("change", async function() {
+    const className = this.value;
+    if (className) {
+        const response = await fetch(WEB_APP_URL, {
+            method: "POST",
+            body: JSON.stringify({ action: "getStudents", className }),
+            headers: { "Content-Type": "application/json" }
+        });
+        const result = await response.json();
+        if (result.success) displayStudents(result.data);
+    } else {
+        document.getElementById("studentList").innerHTML = "";
+        document.getElementById("submitBtn").style.display = "none";
     }
-  })
-    .then(res => res.text())
-    .then(response => {
-      alert("Attendance submitted successfully!");
-      console.log(response);
-    })
-    .catch(err => {
-      alert("Error submitting attendance.");
-      console.error(err);
+});
+
+function displayStudents(students) {
+    const container = document.getElementById("studentList");
+    container.innerHTML = "";
+    students.forEach(student => {
+        const div = document.createElement("div");
+        div.className = "student";
+        div.innerHTML = `
+            <strong>${student.name}</strong><br>
+            Reg No: ${student.regNo}<br>
+            <label><input type="radio" name="status_${student.regNo}" value="Present" checked> Present</label>
+            <label><input type="radio" name="status_${student.regNo}" value="Absent"> Absent</label>
+        `;
+        container.appendChild(div);
     });
+    document.getElementById("submitBtn").style.display = "inline-block";
+}
+
+document.getElementById("submitBtn").addEventListener("click", async function() {
+    const className = document.getElementById("classSelect").value;
+    const date = new Date().toLocaleDateString("en-GB");
+    const studentDivs = document.querySelectorAll(".student");
+    let attendanceData = [];
+
+    studentDivs.forEach(div => {
+        const regNo = div.querySelector("strong").nextSibling.textContent.split(": ")[1];
+        const name = div.querySelector("strong").textContent;
+        const status = div.querySelector("input[type='radio']:checked").value;
+        attendanceData.push({ date, class: className, regNo, name, status });
+    });
+
+    await fetch(WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify({ action: "submitAttendance", attendanceData }),
+        headers: { "Content-Type": "application/json" }
+    });
+
+    alert("Attendance submitted successfully!");
+    document.getElementById("studentList").innerHTML = "";
+    document.getElementById("submitBtn").style.display = "none";
 });
