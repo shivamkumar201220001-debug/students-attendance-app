@@ -1,6 +1,6 @@
 const API_KEY = "AIzaSyBZbdgXYIDzotRfsGe3Kw6bhTkrU1nrpfA";
 const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzj9PkWzZZsxbfHgiEk_hi0PxLH6XSKZu9r25OaN8YsFO-7Lth5WgeyVDxp47Dsdt1gOw/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw09e6qodrush3jFVgT35R4PPHCxRxtAniCtZ4r_FnIj5k5TdSD6T2HhpiCDjotCKN13A/exec";
 
 const classTabs = ["6th", "7th", "8th"];  // Add more if needed
 
