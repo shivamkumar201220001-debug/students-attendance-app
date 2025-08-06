@@ -22,7 +22,7 @@ classSelect.addEventListener("change", () => {
   const selectedClass = classSelect.value;
   if (!selectedClass) return;
 
-  const url = https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${selectedClass}?key=${API_KEY};
+  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${selectedClass}?key=${API_KEY}`;
 
   fetch(url)
     .then(res => res.json())
@@ -39,67 +39,9 @@ classSelect.addEventListener("change", () => {
         const [regNo, name] = row;
 
         const tr = document.createElement("tr");
-        tr.innerHTML = 
+        tr.innerHTML = `
           <td>${regNo}</td>
           <td>${name}</td>
           <td>
             <select>
               <option value="Present">Present</option>
-              <option value="Absent">Absent</option>
-            </select>
-          </td>
-        ;
-        studentsTableBody.appendChild(tr);
-      });
-    })
-    .catch(err => {
-      console.error("Fetch error:", err);
-      studentsTableBody.innerHTML = "<tr><td colspan='3'>Error loading data</td></tr>";
-    });
-});
-
-// ✅ Submit Attendance to Web App
-submitBtn.addEventListener("click", () => {
-  const selectedDate = attendanceDate.value;
-  const selectedClass = classSelect.value;
-
-  if (!selectedDate || !selectedClass) {
-    alert("Please select both date and class.");
-    return;
-  }
-
-  const attendanceData = [];
-  const rows = studentsTableBody.querySelectorAll("tr");
-
-  rows.forEach(row => {
-    const regNo = row.cells[0].textContent;
-    const name = row.cells[1].textContent;
-    const attendance = row.cells[2].querySelector("select").value;
-
-    attendanceData.push({
-      date: selectedDate,
-      class: selectedClass,
-      regNo: regNo,
-      name: name,
-      attendance: attendance
-    });
-  });
-
-  // Send to Google Apps Script
-  fetch(WEB_APP_URL, {
-    method: "POST",
-    body: JSON.stringify(attendanceData),
-    headers: {
-      "Content-Type": "application/json"
-    }
-  })
-    .then(res => res.text())
-    .then(response => {
-      alert("Attendance submitted successfully!");
-      console.log(response);
-    })
-    .catch(err => {
-      alert("Error submitting attendance.");
-      console.error(err);
-    });
-});      
