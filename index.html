@@ -16,7 +16,10 @@
 
       <label for="classSelect">Select Class:</label>
       <select id="classSelect">
-        <option value="">--Select Class--</option>
+        <option value="Class 10A">Class 10A</option>
+        <option value="Class 10B">Class 10B</option>
+        <option value="Class 11A">Class 11A</option>
+        <!-- Add more classes as needed -->
       </select>
     </div>
 
@@ -28,10 +31,36 @@
           <th>Attendance</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody>
+        <tr>
+          <td>1001</td>
+          <td>Ravi Kumar</td>
+          <td>
+            <select>
+              <option value="">--Select--</option>
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+              <option value="Leave">Leave</option>
+            </select>
+          </td>
+        </tr>
+        <tr>
+          <td>1002</td>
+          <td>Pooja Sharma</td>
+          <td>
+            <select>
+              <option value="">--Select--</option>
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+              <option value="Leave">Leave</option>
+            </select>
+          </td>
+        </tr>
+        <!-- Add more rows -->
+      </tbody>
     </table>
 
-   <button onclick="submitAttendance()">✅ Submit Attendance</button>
+    <button onclick="submitAttendance()">✅ Submit Attendance</button>
   </div>
 
   <script src="script.js"></script>
