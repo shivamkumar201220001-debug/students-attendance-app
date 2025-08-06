@@ -1,8 +1,8 @@
-const API_KEY = "AIzaSyCFVED1V4gDZcXeqn6Xsn2MKoSZeFHsaRc";
+const API_KEY = "AIzaSyBZbdgXYIDzotRfsGe3Kw6bhTkrU1nrpfA";
 const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzEML8aNVv-ePKjfFkuqG_A8wS82xwg5vvL9UOGiNC8lxX01b_WlCRI2bN-nSwLEGfJTw/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxA5FUctFerRjy9huqGtk_WpaNRSJkQGrGMtP6jeBKIYEF6xWDO-LvtlGjz88MENa2MNg/exec";
 
-const classTabs = ["6th", "7th", "8th"]; // Add more if needed
+const classTabs = ["6th", "7th", "8th"];  // Add more if needed
 
 const classSelect = document.getElementById("classSelect");
 const studentsTableBody = document.querySelector("#studentsTable tbody");
@@ -23,6 +23,9 @@ classSelect.addEventListener("change", () => {
   if (!selectedClass) return;
 
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${selectedClass}?key=${API_KEY}`;
+  
+  console.log("Fetching class:", selectedClass);
+  console.log("URL:", url);
 
   fetch(url)
     .then(res => res.json())
@@ -45,3 +48,61 @@ classSelect.addEventListener("change", () => {
           <td>
             <select>
               <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+            </select>
+          </td>
+        `;
+        studentsTableBody.appendChild(tr);
+      });
+    })
+    .catch(err => {
+      console.error("Fetch error:", err);
+      studentsTableBody.innerHTML = "<tr><td colspan='3'>Error loading data</td></tr>";
+    });
+});
+
+// ✅ Submit Attendance to Web App
+submitBtn.addEventListener("click", () => {
+  const selectedDate = attendanceDate.value;
+  const selectedClass = classSelect.value;
+
+  if (!selectedDate || !selectedClass) {
+    alert("Please select both date and class.");
+    return;
+  }
+
+  const attendanceData = [];
+  const rows = studentsTableBody.querySelectorAll("tr");
+
+  rows.forEach(row => {
+    const regNo = row.cells[0].textContent;
+    const name = row.cells[1].textContent;
+    const attendance = row.cells[2].querySelector("select").value;
+
+    attendanceData.push({
+      date: selectedDate,
+      class: selectedClass,
+      regNo: regNo,
+      name: name,
+      attendance: attendance
+    });
+  });
+
+  // Send to Google Apps Script
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    body: JSON.stringify(attendanceData),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+    .then(res => res.text())
+    .then(response => {
+      alert("Attendance submitted successfully!");
+      console.log(response);
+    })
+    .catch(err => {
+      alert("Error submitting attendance.");
+      console.error(err);
+    });
+});
