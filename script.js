@@ -1,7 +1,6 @@
 const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
 const API_KEY = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxkjfwZl7Dw0ij4LyMIa4ev5uCMsnnNtmxEZ2dMXWLzYfpuDqJeNjGvq7GV7Wi4kqOrHQ/exec?action=getData";
-
 const classSelect = document.getElementById("classSelect");
 const loadBtn = document.getElementById("loadBtn");
 const studentsContainer = document.getElementById("studentsContainer");
@@ -15,7 +14,7 @@ const message = document.getElementById("message");
 // Set today's date as default
 dateInput.value = new Date().toISOString().slice(0, 10);
 
-// Hardcoded classes list
+// Hardcoded classes list (you can modify)
 const classes = [
   "8th",
   "9th",
@@ -57,9 +56,11 @@ submitBtn.addEventListener("click", submitAttendance);
 async function loadStudents() {
   const cls = classSelect.value;
   if (!cls) return showMessage("Choose a class first");
-  studentsContainer.innerHTML = "Loading students...";
+  studentsContainer.innerHTML = "<i>Loading students...</i>";
   try {
-    const res = await fetch(`${WEB_APP_URL}?action=getStudents&className=${encodeURIComponent(cls)}`);
+    // call GET action
+    const url = `${WEB_APP_URL}?action=getStudents&className=${encodeURIComponent(cls)}`;
+    const res = await fetch(url);
     const data = await res.json();
     if (data.success) {
       renderStudents(data.students);
@@ -84,9 +85,9 @@ function renderStudents(students) {
     const row = document.createElement("div");
     row.className = "student-row";
     row.innerHTML = `
-      <div>${idx + 1}.</div>
-      <div class="name"><strong>${escapeHtml(s.name)}</strong><div style="font-size:12px;color:#666">${escapeHtml(s.regNo)}</div></div>
-      <div>
+      <div class="index">${idx + 1}.</div>
+      <div class="name"><strong>${escapeHtml(s.name)}</strong><div class="reg">${escapeHtml(s.regNo)}</div></div>
+      <div class="sel">
         <select data-reg="${escapeHtml(s.regNo)}" data-name="${escapeHtml(s.name)}" aria-label="Attendance status for ${escapeHtml(s.name)}">
           <option value="Present">Present</option>
           <option value="Absent">Absent</option>
@@ -106,7 +107,9 @@ function setAllStatus(val) {
 async function submitAttendance() {
   const cls = classSelect.value;
   if (!cls) return showMessage("Choose class first");
-  const teacher = teacherInput.value.trim() || "Unknown";
+  const teacher = teacherInput.value.trim();
+  if (!teacher) return showMessage("Enter teacher name before submitting");
+
   const selects = studentsContainer.querySelectorAll("select");
   if (!selects.length) return showMessage("Load students first");
 
@@ -120,7 +123,8 @@ async function submitAttendance() {
 
   try {
     showMessage("Submitting...");
-    const res = await fetch(WEB_APP_URL, {
+    // POST to web app
+    const res = await fetch(`${WEB_APP_URL}?action=submitAttendance`, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: { "Content-Type": "application/json" },
@@ -143,15 +147,6 @@ function showMessage(txt) {
 function escapeHtml(s) {
   if (!s) return "";
   return s.toString().replace(/[&<>"'`=\/]/g, c =>
-    ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;",
-      "/": "&#47;",
-      "`": "&#96;",
-      "=": "&#61;",
-    }[c])
+    ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;","/":"&#47;","`":"&#96;","=":"&#61;"}[c])
   );
 }
