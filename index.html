@@ -1,37 +1,47 @@
-<!DOCTYPE html>
+<!-- index.html -->
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Students Attendance App</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Students Portal</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="container">
-        <h1>📋 Students Attendance</h1>
-        <form id="attendanceForm">
-            <input type="text" id="studentName" placeholder="Enter Student Name" required>
-            <select id="status" required>
-                <option value="">Select Status</option>
-                <option value="Present">Present ✅</option>
-                <option value="Absent">Absent ❌</option>
-            </select>
-            <button type="submit">Submit</button>
-        </form>
+  <div class="container">
+    <header class="top">
+      <h1>📚 Students Portal</h1>
+      <p class="subtitle">Quick attendance — enter teacher name, choose class, load students & submit</p>
+    </header>
 
-        <h2>Attendance Records</h2>
-        <table id="attendanceTable">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody id="records"></tbody>
-        </table>
+    <div class="form-row">
+      <label for="teacherInput">👨‍🏫 Teacher Name / ID</label>
+      <input id="teacherInput" placeholder="Enter your name before taking attendance" autocomplete="off" />
     </div>
 
-    <script src="script.js"></script>
+    <div class="form-row">
+      <label for="classSelect">🏫 Select Class</label>
+      <select id="classSelect"><option value="">-- choose class --</option></select>
+      <button id="loadBtn" type="button">Load Students</button>
+    </div>
+
+    <div class="controls">
+      <button id="allPresentBtn" type="button">✅ Mark All Present</button>
+      <button id="allAbsentBtn" type="button">❌ Mark All Absent</button>
+    </div>
+
+    <div id="studentsContainer" aria-live="polite"></div>
+
+    <div class="form-row">
+      <label for="dateInput">📅 Date</label>
+      <input type="date" id="dateInput" />
+      <button id="submitBtn" type="button">📤 Submit Attendance</button>
+    </div>
+
+    <div id="message" role="alert" aria-live="polite"></div>
+    <footer class="footer">yogesh joshi ❤️ • Students Portal</footer>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
