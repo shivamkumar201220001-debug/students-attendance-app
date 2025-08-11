@@ -12,37 +12,49 @@ const teacherInput = document.getElementById("teacherInput");
 const dateInput = document.getElementById("dateInput");
 const message = document.getElementById("message");
 
-dateInput.value = new Date().toISOString().slice(0,10);
+// Set today's date as default
+dateInput.value = new Date().toISOString().slice(0, 10);
 
-async function init(){
+// Hardcoded classes list
+const classes = [
+  "8th",
+  "9th",
+  "9th 2nd",
+  "10th",
+  "10th 2nd",
+  "11th JEE Morning",
+  "11th NEET Morning",
+  "12th JEE Morning",
+  "12th NEET Morning",
+  "Drooper JEE",
+  "Dropper NEET",
+  "Dropper NEET 2.0",
+  "11th JEE Evening",
+  "11th NEET Evening",
+  "12th JEE Evening",
+  "12th NEET Evening"
+];
+
+function init() {
   showMessage("Loading classes...");
-  try {
-    const res = await fetch(`${WEB_APP_URL}?action=getClasses`);
-    const data = await res.json();
-    if (data.success) {
-      classSelect.innerHTML = `<option value="">-- choose class --</option>`;
-      data.classes.forEach(c => {
-        const opt = document.createElement("option");
-        opt.value = c;
-        opt.textContent = c;
-        classSelect.appendChild(opt);
-      });
-      showMessage("");
-    } else {
-      showMessage("Could not load classes: " + (data.error||""));
-    }
-  } catch(err) {
-    showMessage("Error loading classes: " + err.message);
-  }
+  classSelect.innerHTML = `<option value="">-- choose class --</option>`;
+  classes.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    classSelect.appendChild(opt);
+  });
+  showMessage("");
 }
+
 init();
 
 loadBtn.addEventListener("click", loadStudents);
-allPresentBtn.addEventListener("click", ()=> setAllStatus("Present"));
-allAbsentBtn.addEventListener("click", ()=> setAllStatus("Absent"));
+allPresentBtn.addEventListener("click", () => setAllStatus("Present"));
+allAbsentBtn.addEventListener("click", () => setAllStatus("Absent"));
 submitBtn.addEventListener("click", submitAttendance);
 
-async function loadStudents(){
+async function loadStudents() {
   const cls = classSelect.value;
   if (!cls) return showMessage("Choose a class first");
   studentsContainer.innerHTML = "Loading students...";
@@ -54,9 +66,9 @@ async function loadStudents(){
       showMessage(`Loaded ${data.students.length} students`);
     } else {
       studentsContainer.innerHTML = "";
-      showMessage("Error: " + (data.error||"No students"));
+      showMessage("Error: " + (data.error || "No students"));
     }
-  } catch(err) {
+  } catch (err) {
     studentsContainer.innerHTML = "";
     showMessage("Fetch error: " + err.message);
   }
@@ -72,10 +84,10 @@ function renderStudents(students) {
     const row = document.createElement("div");
     row.className = "student-row";
     row.innerHTML = `
-      <div>${idx+1}.</div>
+      <div>${idx + 1}.</div>
       <div class="name"><strong>${escapeHtml(s.name)}</strong><div style="font-size:12px;color:#666">${escapeHtml(s.regNo)}</div></div>
       <div>
-        <select data-reg="${escapeHtml(s.regNo)}" data-name="${escapeHtml(s.name)}">
+        <select data-reg="${escapeHtml(s.regNo)}" data-name="${escapeHtml(s.name)}" aria-label="Attendance status for ${escapeHtml(s.name)}">
           <option value="Present">Present</option>
           <option value="Absent">Absent</option>
           <option value="Leave">Leave</option>
@@ -86,12 +98,12 @@ function renderStudents(students) {
   });
 }
 
-function setAllStatus(val){
+function setAllStatus(val) {
   const selects = studentsContainer.querySelectorAll("select");
-  selects.forEach(s => s.value = val);
+  selects.forEach(s => (s.value = val));
 }
 
-async function submitAttendance(){
+async function submitAttendance() {
   const cls = classSelect.value;
   if (!cls) return showMessage("Choose class first");
   const teacher = teacherInput.value.trim() || "Unknown";
@@ -101,7 +113,7 @@ async function submitAttendance(){
   const attendance = Array.from(selects).map(s => ({
     regNo: s.getAttribute("data-reg"),
     name: s.getAttribute("data-name"),
-    status: s.value
+    status: s.value,
   }));
 
   const payload = { date: dateInput.value, className: cls, teacher, attendance };
@@ -111,18 +123,35 @@ async function submitAttendance(){
     const res = await fetch(WEB_APP_URL, {
       method: "POST",
       body: JSON.stringify(payload),
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
     const data = await res.json();
     if (data.success) {
-      showMessage(`Submitted — rows inserted: ${data.inserted}`);
+      showMessage(`Submitted successfully — rows inserted: ${data.inserted}`);
     } else {
-      showMessage("Submit failed: " + (data.error||JSON.stringify(data)));
+      showMessage("Submit failed: " + (data.error || JSON.stringify(data)));
     }
-  } catch(err) {
+  } catch (err) {
     showMessage("Submit error: " + err.message);
   }
 }
 
-function showMessage(txt){ message.textContent = txt; }
-function escapeHtml(s){ if (!s) return ""; return s.toString().replace(/[&<>"'`=\/]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#47;','`':'&#96;','=':'&#61;'}[c])); }
+function showMessage(txt) {
+  message.textContent = txt;
+}
+
+function escapeHtml(s) {
+  if (!s) return "";
+  return s.toString().replace(/[&<>"'`=\/]/g, c =>
+    ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+      "/": "&#47;",
+      "`": "&#96;",
+      "=": "&#61;",
+    }[c])
+  );
+}
