@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -11,30 +11,30 @@
     <h1>Students Attendance</h1>
 
     <div class="row">
-      <label>Teacher name / ID</label>
-      <input id="teacherInput" placeholder="Enter teacher name or ID" />
+      <label for="teacherInput">Teacher name / ID</label>
+      <input id="teacherInput" placeholder="Enter teacher name or ID" autocomplete="off" />
     </div>
 
     <div class="row">
-      <label>Select Class</label>
+      <label for="classSelect">Select Class</label>
       <select id="classSelect"><option value="">-- loading... --</option></select>
-      <button id="loadBtn">Load Students</button>
+      <button id="loadBtn" type="button">Load Students</button>
     </div>
 
     <div class="controls">
-      <button id="allPresentBtn">Mark All Present</button>
-      <button id="allAbsentBtn">Mark All Absent</button>
+      <button id="allPresentBtn" type="button">Mark All Present</button>
+      <button id="allAbsentBtn" type="button">Mark All Absent</button>
     </div>
 
     <div id="studentsContainer"></div>
 
     <div class="row">
-      <label>Date</label>
+      <label for="dateInput">Date</label>
       <input type="date" id="dateInput" />
-      <button id="submitBtn">Submit Attendance</button>
+      <button id="submitBtn" type="button">Submit Attendance</button>
     </div>
 
-    <div id="message"></div>
+    <div id="message" role="alert" aria-live="polite"></div>
   </div>
 
   <script src="script.js"></script>
