@@ -1,40 +1,45 @@
+<!-- index.html -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Students Attendance</title>
+  <title>Students Portal</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>Students Attendance</h1>
+    <header class="top">
+      <h1>📚 Students Portal</h1>
+      <p class="subtitle">Quick attendance — enter teacher name, choose class, load students & submit</p>
+    </header>
 
-    <div class="row">
-      <label for="teacherInput">Teacher name / ID</label>
-      <input id="teacherInput" placeholder="Enter teacher name or ID" autocomplete="off" />
+    <div class="form-row">
+      <label for="teacherInput">👨‍🏫 Teacher Name / ID</label>
+      <input id="teacherInput" placeholder="Enter your name before taking attendance" autocomplete="off" />
     </div>
 
-    <div class="row">
-      <label for="classSelect">Select Class</label>
-      <select id="classSelect"><option value="">-- loading... --</option></select>
+    <div class="form-row">
+      <label for="classSelect">🏫 Select Class</label>
+      <select id="classSelect"><option value="">-- choose class --</option></select>
       <button id="loadBtn" type="button">Load Students</button>
     </div>
 
     <div class="controls">
-      <button id="allPresentBtn" type="button">Mark All Present</button>
-      <button id="allAbsentBtn" type="button">Mark All Absent</button>
+      <button id="allPresentBtn" type="button">✅ Mark All Present</button>
+      <button id="allAbsentBtn" type="button">❌ Mark All Absent</button>
     </div>
 
-    <div id="studentsContainer"></div>
+    <div id="studentsContainer" aria-live="polite"></div>
 
-    <div class="row">
-      <label for="dateInput">Date</label>
+    <div class="form-row">
+      <label for="dateInput">📅 Date</label>
       <input type="date" id="dateInput" />
-      <button id="submitBtn" type="button">Submit Attendance</button>
+      <button id="submitBtn" type="button">📤 Submit Attendance</button>
     </div>
 
     <div id="message" role="alert" aria-live="polite"></div>
+    <footer class="footer">Made with ❤️ • Students Portal</footer>
   </div>
 
   <script src="script.js"></script>
