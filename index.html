@@ -1,67 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Students Attendance App</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Students Attendance</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>Students Attendance App</h1>
+    <h1>Students Attendance</h1>
 
-    <div class="controls">
-      <label for="attendanceDate">Select Date:</label>
-      <input type="date" id="attendanceDate" />
+    <div class="box">
+      <label>Teacher name / ID</label>
+      <input id="teacherInput" placeholder="Enter your name or ID" />
+    </div>
 
-      <label for="classSelect">Select Class:</label>
+    <div class="box">
+      <label>Select Class</label>
       <select id="classSelect">
-       "8th", "9th 1st", "9th 2nd", "10th 1st", "10th 2nd", 
-    "11th JEE Morning", "11th JEE Evening", "11th NEET Morning", "11th NEET Evening", 
-    "12th JEE Morning", "12th JEE Evening", "12th NEET Morning", "12th NEET Evening",
-    "Drooper NEET", "Drooper NEET 2.0"
-        ];
+        <option value="">-- choose class --</option>
       </select>
     </div>
 
-    <table id="studentsTable">
-      <thead>
-        <tr>
-          <th>Reg. No</th>
-          <th>Student Name</th>
-          <th>Attendance</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1001</td>
-          <td>Ravi Kumar</td>
-          <td>
-            <select>
-              <option value="">--Select--</option>
-              <option value="Present">Present</option>
-              <option value="Absent">Absent</option>
-              <option value="Leave">Leave</option>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td>1002</td>
-          <td>Pooja Sharma</td>
-          <td>
-            <select>
-              <option value="">--Select--</option>
-              <option value="Present">Present</option>
-              <option value="Absent">Absent</option>
-              <option value="Leave">Leave</option>
-            </select>
-          </td>
-        </tr>
-        <!-- Add more rows -->
-      </tbody>
-    </table>
+    <div class="controls">
+      <button id="loadBtn">Load Students</button>
+      <button id="allPresentBtn">Mark All Present</button>
+      <button id="allAbsentBtn">Mark All Absent</button>
+    </div>
 
-    <button onclick="submitAttendance()">✅ Submit Attendance</button>
+    <div id="studentsContainer"></div>
+
+    <div class="submitRow">
+      <label>Date</label>
+      <input type="date" id="dateInput" />
+      <button id="submitBtn">Submit Attendance</button>
+    </div>
+
+    <div id="message"></div>
   </div>
 
   <script src="script.js"></script>
