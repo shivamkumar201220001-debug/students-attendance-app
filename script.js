@@ -1,66 +1,128 @@
 const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
 const API_KEY = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyYJ7Zzq03Ad-5mNSNmYzst9tGljhKN9avJu0sKH3Sq49aqfISfU1UFoJAF4lEysjjxag/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw3oW-AdW0MqpG_ssdbDsb1eCHp8sMMmrMC90K8SbjepHFv95JfWm36Qc3Q4jDo_rmEPQ/exec";
 
-async function loadStudents() {
-  const className = document.getElementById("classSelect").value;
-  if (!className) {
-    alert("Please select a class!");
+const classSelect = document.getElementById("classSelect");
+const loadBtn = document.getElementById("loadBtn");
+const studentsContainer = document.getElementById("studentsContainer");
+const allPresentBtn = document.getElementById("allPresentBtn");
+const allAbsentBtn = document.getElementById("allAbsentBtn");
+const submitBtn = document.getElementById("submitBtn");
+const teacherInput = document.getElementById("teacherInput");
+const dateInput = document.getElementById("dateInput");
+const message = document.getElementById("message");
+
+dateInput.value = new Date().toISOString().slice(0,10);
+
+async function init(){
+  showMessage("Loading classes...");
+  try {
+    const res = await fetch(`${WEB_APP_URL}?action=getClasses`);
+    const data = await res.json();
+    if (data.success) {
+      classSelect.innerHTML = `<option value="">-- choose class --</option>`;
+      data.classes.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        classSelect.appendChild(opt);
+      });
+      showMessage("");
+    } else {
+      showMessage("Could not load classes: " + (data.error||""));
+    }
+  } catch(err) {
+    showMessage("Error loading classes: " + err.message);
+  }
+}
+init();
+
+loadBtn.addEventListener("click", loadStudents);
+allPresentBtn.addEventListener("click", ()=> setAllStatus("Present"));
+allAbsentBtn.addEventListener("click", ()=> setAllStatus("Absent"));
+submitBtn.addEventListener("click", submitAttendance);
+
+async function loadStudents(){
+  const cls = classSelect.value;
+  if (!cls) return showMessage("Choose a class first");
+  studentsContainer.innerHTML = "Loading students...";
+  try {
+    const res = await fetch(`${WEB_APP_URL}?action=getStudents&className=${encodeURIComponent(cls)}`);
+    const data = await res.json();
+    if (data.success) {
+      renderStudents(data.students);
+      showMessage(`Loaded ${data.students.length} students`);
+    } else {
+      studentsContainer.innerHTML = "";
+      showMessage("Error: " + (data.error||"No students"));
+    }
+  } catch(err) {
+    studentsContainer.innerHTML = "";
+    showMessage("Fetch error: " + err.message);
+  }
+}
+
+function renderStudents(students) {
+  studentsContainer.innerHTML = "";
+  if (!students || students.length === 0) {
+    studentsContainer.innerHTML = "<i>No students found.</i>";
     return;
   }
-
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(className)}?key=${API_KEY}`;
-  
-  const res = await fetch(url);
-  const data = await res.json();
-
-  const tableBody = document.querySelector("#studentsTable tbody");
-  tableBody.innerHTML = "";
-
-  data.values.slice(1).forEach(row => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${row[0]}</td>
-      <td>${row[1]}</td>
-      <td>
-        <select>
+  students.forEach((s, idx) => {
+    const row = document.createElement("div");
+    row.className = "student-row";
+    row.innerHTML = `
+      <div>${idx+1}.</div>
+      <div class="name"><strong>${escapeHtml(s.name)}</strong><div style="font-size:12px;color:#666">${escapeHtml(s.regNo)}</div></div>
+      <div>
+        <select data-reg="${escapeHtml(s.regNo)}" data-name="${escapeHtml(s.name)}">
           <option value="Present">Present</option>
           <option value="Absent">Absent</option>
+          <option value="Leave">Leave</option>
         </select>
-      </td>
+      </div>
     `;
-    tableBody.appendChild(tr);
+    studentsContainer.appendChild(row);
   });
 }
 
-document.getElementById("attendanceForm").addEventListener("submit", async function(e) {
-  e.preventDefault();
+function setAllStatus(val){
+  const selects = studentsContainer.querySelectorAll("select");
+  selects.forEach(s => s.value = val);
+}
 
-  const className = document.getElementById("classSelect").value;
-  const date = new Date().toLocaleDateString("en-IN");
+async function submitAttendance(){
+  const cls = classSelect.value;
+  if (!cls) return showMessage("Choose class first");
+  const teacher = teacherInput.value.trim() || "Unknown";
+  const selects = studentsContainer.querySelectorAll("select");
+  if (!selects.length) return showMessage("Load students first");
 
-  const rows = document.querySelectorAll("#studentsTable tbody tr");
-  const attendanceData = [];
+  const attendance = Array.from(selects).map(s => ({
+    regNo: s.getAttribute("data-reg"),
+    name: s.getAttribute("data-name"),
+    status: s.value
+  }));
 
-  rows.forEach(row => {
-    const regno = row.cells[0].innerText;
-    const name = row.cells[1].innerText;
-    const status = row.cells[2].querySelector("select").value;
+  const payload = { date: dateInput.value, className: cls, teacher, attendance };
 
-    attendanceData.push({
-      date: date,
-      class: className,
-      regno: regno,
-      name: name,
-      status: status
+  try {
+    showMessage("Submitting...");
+    const res = await fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: { "Content-Type": "application/json" }
     });
-  });
+    const data = await res.json();
+    if (data.success) {
+      showMessage(`Submitted — rows inserted: ${data.inserted}`);
+    } else {
+      showMessage("Submit failed: " + (data.error||JSON.stringify(data)));
+    }
+  } catch(err) {
+    showMessage("Submit error: " + err.message);
+  }
+}
 
-  const res = await fetch(WEB_APP_URL, {
-    method: "POST",
-    body: JSON.stringify(attendanceData)
-  });
-
-  const text = await res.text();
-  alert(text);
-});
+function showMessage(txt){ message.textContent = txt; }
+function escapeHtml(s){ if (!s) return ""; return s.toString().replace(/[&<>"'`=\/]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','/':'&#47;','`':'&#96;','=':'&#61;'}[c])); }
