@@ -1,6 +1,6 @@
 const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
 const API_KEY = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw3oW-AdW0MqpG_ssdbDsb1eCHp8sMMmrMC90K8SbjepHFv95JfWm36Qc3Q4jDo_rmEPQ/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxlZRWWY4Dn8cVq-VmuzSkl27pInxVsj0jhgDLBJwyhHCwsheSQUcXrcUgVKKyKvllIkw/exec";
 
 const classSelect = document.getElementById("classSelect");
 const loadBtn = document.getElementById("loadBtn");
