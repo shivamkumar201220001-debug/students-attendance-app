@@ -1,7 +1,7 @@
 const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
 const API_KEY = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxkjfwZl7Dw0ij4LyMIa4ev5uCMsnnNtmxEZ2dMXWLzYfpuDqJeNjGvq7GV7Wi4kqOrHQ/exec?action=getData";
-const SHEET_URL = "https://script.google.com/macros/s/AKfycbxkjfwZl7Dw0ij4LyMIa4ev5uCMsnnNtmxEZ2dMXWLzYfpuDqJeNjGvq7GV7Wi4kqOrHQ/exec?action=getData";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxKF3R8Q7ep5_qs21xchqraUsxcVPg3t-4z4SWp6ZdHP6e2j50hYn_gexM_p2P9jxobcQ/exec?action=getData";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxKF3R8Q7ep5_qs21xchqraUsxcVPg3t-4z4SWp6ZdHP6e2j50hYn_gexM_p2P9jxobcQ/exec?action=getData";
 
 document.getElementById("attendanceForm").addEventListener("submit", function(e) {
     e.preventDefault();
