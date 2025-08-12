@@ -1,47 +1,58 @@
-<!-- index.html -->
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Students Portal</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Student Attendance</title>
 </head>
 <body>
-  <div class="container">
-    <header class="top">
-      <h1>📚 Students Portal</h1>
-      <p class="subtitle">Quick attendance — enter teacher name, choose class, load students & submit</p>
-    </header>
+  <h1>Mark Attendance</h1>
+  <table border="1" id="attendanceTable">
+    <tr>
+      <th>Reg No</th>
+      <th>Name</th>
+      <th>Status</th>
+    </tr>
+  </table>
+  <button onclick="submitAttendance()">Submit</button>
 
-    <div class="form-row">
-      <label for="teacherInput">👨‍🏫 Teacher Name / ID</label>
-      <input id="teacherInput" placeholder="Enter your name before taking attendance" autocomplete="off" />
-    </div>
+  <script>
+    const API_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
 
-    <div class="form-row">
-      <label for="classSelect">🏫 Select Class</label>
-      <select id="classSelect"><option value="">-- choose class --</option></select>
-      <button id="loadBtn" type="button">Load Students</button>
-    </div>
+    fetch(API_URL)
+      .then(res => res.json())
+      .then(students => {
+        let table = document.getElementById("attendanceTable");
+        students.forEach(s => {
+          let row = table.insertRow();
+          row.insertCell(0).innerText = s.regNo;
+          row.insertCell(1).innerText = s.name;
+          let select = document.createElement("select");
+          ["Present", "Absent"].forEach(optText => {
+            let opt = document.createElement("option");
+            opt.value = optText;
+            opt.text = optText;
+            select.appendChild(opt);
+          });
+          row.insertCell(2).appendChild(select);
+        });
+      });
 
-    <div class="controls">
-      <button id="allPresentBtn" type="button">✅ Mark All Present</button>
-      <button id="allAbsentBtn" type="button">❌ Mark All Absent</button>
-    </div>
-
-    <div id="studentsContainer" aria-live="polite"></div>
-
-    <div class="form-row">
-      <label for="dateInput">📅 Date</label>
-      <input type="date" id="dateInput" />
-      <button id="submitBtn" type="button">📤 Submit Attendance</button>
-    </div>
-
-    <div id="message" role="alert" aria-live="polite"></div>
-    <footer class="footer">yogesh joshi ❤️ • Students Portal</footer>
-  </div>
-
-  <script src="script.js"></script>
+    function submitAttendance() {
+      let rows = document.getElementById("attendanceTable").rows;
+      let data = [];
+      for (let i = 1; i < rows.length; i++) {
+        let regNo = rows[i].cells[0].innerText;
+        let status = rows[i].cells[2].children[0].value;
+        data.push({ regNo, status });
+      }
+      fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(res => {
+        alert("Attendance Saved Successfully!");
+      });
+    }
+  </script>
 </body>
 </html>
