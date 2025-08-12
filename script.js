@@ -59,7 +59,7 @@ async function loadStudents() {
   studentsContainer.innerHTML = "<i>Loading students...</i>";
   try {
     // call GET action
-    const url = `${WEB_APP_URL}?action=getStudents&className=${encodeURIComponent(cls)}`;
+    const url = `${https://script.google.com/macros/s/AKfycbyiLOXgj9A-FbaWMZeeCrnURmcfwRGg9V0yk0P6bWAPUsWWYFFjkDKHmE48c1aaoaG5/exec}?action=getStudents&className=${encodeURIComponent(cls)}`;
     const res = await fetch(url);
     const data = await res.json();
     if (data.success) {
@@ -124,7 +124,7 @@ async function submitAttendance() {
   try {
     showMessage("Submitting...");
     // POST to web app
-    const res = await fetch(`${WEB_APP_URL}?action=submitAttendance`, {
+    const res = await fetch(`${https://script.google.com/macros/s/AKfycbyiLOXgj9A-FbaWMZeeCrnURmcfwRGg9V0yk0P6bWAPUsWWYFFjkDKHmE48c1aaoaG5/exec}?action=submitAttendance`, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: { "Content-Type": "application/json" },
