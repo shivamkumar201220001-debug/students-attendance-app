@@ -1,59 +1,121 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
 <head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Student Attendance</title>
+  <style>
+    body{font-family: Arial, sans-serif; padding:16px; max-width:900px; margin:auto}
+    table{width:100%; border-collapse:collapse}
+    th,td{border:1px solid #ddd; padding:8px; text-align:left}
+    th{background:#f4f4f4}
+    .status{font-size:0.9rem; padding:4px 6px; margin-left:8px}
+    .saving{color:#ff9800}
+    .saved{color:#4caf50}
+    .err{color:#e53935}
+  </style>
 </head>
 <body>
-  <h1>Mark Attendance</h1>
-  <table border="1" id="attendanceTable">
-    <tr>
-      <th>Reg No</th>
-      <th>Name</th>
-      <th>Status</th>
-    </tr>
+  <h2>Mark Attendance</h2>
+  <p>Dropdown select karte hi attendance automatically save ho jayega.</p>
+
+  <table id="attendanceTable">
+    <thead>
+      <tr>
+        <th>Reg No</th>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
   </table>
-  <button onclick="submitAttendance()">Submit</button>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzNv033grqyA-Xbw5uHT0FkvapQYvw1NSF2PV5d_hKmSik7GHBN4P7CNs9yj2jjexd3/exec
-";
+    // --- Aapka naya Web App URL ---
+    const API_URL = "https://script.google.com/macros/s/AKfycbzNv033grqyA-Xbw5uHT0FkvapQYvw1NSF2PV5d_hKmSik7GHBN4P7CNs9yj2jjexd3/exec";
 
-    fetch(API_URL)
-      .then(res => res.json())
-      .then(students => {
-        let table = document.getElementById("attendanceTable");
-        students.forEach(s => {
-          let row = table.insertRow();
-          row.insertCell(0).innerText = s.regNo;
-          row.insertCell(1).innerText = s.name;
-          let select = document.createElement("select");
-          ["Present", "Absent"].forEach(optText => {
-            let opt = document.createElement("option");
-            opt.value = optText;
-            opt.text = optText;
-            select.appendChild(opt);
-          });
-          row.insertCell(2).appendChild(select);
-        });
-      });
-
-    function submitAttendance() {
-      let rows = document.getElementById("attendanceTable").rows;
-      let data = [];
-      for (let i = 1; i < rows.length; i++) {
-        let regNo = rows[i].cells[0].innerText;
-        let status = rows[i].cells[2].children[0].value;
-        data.push({ regNo, status });
+    // Students list load karna
+    async function loadStudents() {
+      try {
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error("Fetch failed: " + res.status);
+        const students = await res.json();
+        populateTable(students);
+      } catch (err) {
+        alert("Student list load error: " + err.message);
+        console.error(err);
       }
-      fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify(data)
-      })
-      .then(res => res.json())
-      .then(res => {
-        alert("Attendance Saved Successfully!");
+    }
+
+    // Table me students add karna
+    function populateTable(students) {
+      const tbody = document.querySelector("#attendanceTable tbody");
+      tbody.innerHTML = "";
+      students.forEach(s => {
+        const tr = document.createElement("tr");
+
+        const tdReg = document.createElement("td");
+        tdReg.textContent = s.regNo;
+        tr.appendChild(tdReg);
+
+        const tdName = document.createElement("td");
+        tdName.textContent = s.name;
+        tr.appendChild(tdName);
+
+        const tdSelect = document.createElement("td");
+        const select = document.createElement("select");
+        ["Present","Absent"].forEach(v => {
+          const opt = document.createElement("option");
+          opt.value = v;
+          opt.textContent = v;
+          select.appendChild(opt);
+        });
+        tdSelect.appendChild(select);
+        tr.appendChild(tdSelect);
+
+        const tdStatus = document.createElement("td");
+        const span = document.createElement("span");
+        span.className = "status";
+        tdStatus.appendChild(span);
+        tr.appendChild(tdStatus);
+
+        // Dropdown change par auto-save
+        select.addEventListener("change", () => {
+          saveSingle({ regNo: s.regNo, status: select.value }, span);
+        });
+
+        tbody.appendChild(tr);
       });
     }
+
+    // Attendance save karna
+    async function saveSingle(item, statusElement) {
+      statusElement.textContent = "Saving…";
+      statusElement.className = "status saving";
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify([item]) // Apps Script array expect karta hai
+        });
+        if (!res.ok) throw new Error("Save failed: " + res.status);
+        const data = await res.json();
+        if (data && data.success) {
+          statusElement.textContent = "✓ Saved";
+          statusElement.className = "status saved";
+        } else {
+          throw new Error("Server error");
+        }
+      } catch (err) {
+        statusElement.textContent = "Error";
+        statusElement.className = "status err";
+        console.error(err);
+      }
+    }
+
+    // Page load par data fetch
+    loadStudents();
   </script>
 </body>
 </html>
