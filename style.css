@@ -1,65 +1,49 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyAV-YCXY_qyEq1qi7olRRgeNLdxuZoU3FM66TL_Bl6DOrE7BHy5Cb0-dcPJAYGM0Ix/exec"; // Your deployed Apps Script Web App URL
-
-// Load classes in dropdown
-fetch(WEB_APP_URL + "?action=getClasses")
-  .then(res => res.json())
-  .then(data => {
-    const classSelect = document.getElementById("classSelect");
-    data.forEach(cls => {
-      const option = document.createElement("option");
-      option.value = cls;
-      option.textContent = cls;
-      classSelect.appendChild(option);
-    });
-  });
-
-document.getElementById("classSelect").addEventListener("change", loadStudents);
-
-function loadStudents() {
-  const selectedClass = document.getElementById("classSelect").value;
-  fetch(WEB_APP_URL + "?action=getStudents&class=" + encodeURIComponent(selectedClass))
-    .then(res => res.json())
-    .then(data => {
-      const tbody = document.querySelector("#studentsTable tbody");
-      tbody.innerHTML = "";
-      data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row[0]}</td>
-          <td>${row[1]}</td>
-          <td>${row[2]}</td>
-          <td>
-            <select>
-              <option value="Present">Present</option>
-              <option value="Absent">Absent</option>
-            </select>
-          </td>
-        `;
-        tbody.appendChild(tr);
-      });
-    });
+body {
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 0;
 }
 
-document.getElementById("submitAttendance").addEventListener("click", () => {
-  const rows = document.querySelectorAll("#studentsTable tbody tr");
-  const selectedClass = document.getElementById("classSelect").value;
-  const attendanceData = [];
+.container {
+  max-width: 900px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+}
 
-  rows.forEach(row => {
-    const regNo = row.cells[0].textContent;
-    const name = row.cells[1].textContent;
-    const status = row.cells[3].querySelector("select").value;
-    attendanceData.push([regNo, name, selectedClass, status, new Date().toLocaleString()]);
-  });
+h1 {
+  text-align: center;
+}
 
-  fetch(WEB_APP_URL, {
-    method: "POST",
-    mode: "cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "submitAttendance", data: attendanceData })
-  })
-  .then(res => res.text())
-  .then(msg => {
-    document.getElementById("statusMsg").textContent = msg;
-  });
-});
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+table, th, td {
+  border: 1px solid #ccc;
+}
+
+th, td {
+  padding: 8px;
+  text-align: center;
+}
+
+select, button {
+  padding: 6px;
+  margin-top: 10px;
+}
+
+button {
+  background: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #218838;
+}
