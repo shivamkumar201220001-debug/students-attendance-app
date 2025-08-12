@@ -1,67 +1,64 @@
 const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
 const API_KEY = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyAV-YCXY_qyEq1qi7olRRgeNLdxuZoU3FM66TL_Bl6DOrE7BHy5Cb0-dcPJAYGM0Ix/exec"; // Your deployed Apps Script Web App URL
-
-// Load classes in dropdown
-fetch(WEB_APP_URL + "?action=getClasses")
-  .then(res => res.json())
-  .then(data => {
-    const classSelect = document.getElementById("classSelect");
-    data.forEach(cls => {
-      const option = document.createElement("option");
-      option.value = cls;
-      option.textContent = cls;
-      classSelect.appendChild(option);
-    });
-  });
-
-document.getElementById("classSelect").addEventListener("change", loadStudents);
-
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyAV-YCXY_qyEq1qi7olRRgeNLdxuZoU3FM66TL_Bl6DOrE7BHy5Cb0-dcPJAYGM0Ix/exec";
 function loadStudents() {
-  const selectedClass = document.getElementById("classSelect").value;
-  fetch(WEB_APP_URL + "?action=getStudents&class=" + encodeURIComponent(selectedClass))
+  const className = document.getElementById("classSelect").value;
+  if (!className) {
+    alert("Please select a class");
+    return;
+  }
+
+  fetch(`${WEB_APP_URL}?action=getStudents&class=${encodeURIComponent(className)}`)
     .then(res => res.json())
     .then(data => {
       const tbody = document.querySelector("#studentsTable tbody");
       tbody.innerHTML = "";
-      data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${row[0]}</td>
-          <td>${row[1]}</td>
-          <td>${row[2]}</td>
-          <td>
-            <select>
-              <option value="Present">Present</option>
-              <option value="Absent">Absent</option>
-            </select>
-          </td>
+      data.forEach(student => {
+        const row = `
+          <tr>
+            <td>${student.regNo}</td>
+            <td>${student.name}</td>
+            <td>
+              <select name="attendance">
+                <option value="Present">Present</option>
+                <option value="Absent">Absent</option>
+              </select>
+            </td>
+          </tr>
         `;
-        tbody.appendChild(tr);
+        tbody.innerHTML += row;
       });
-    });
+    })
+    .catch(err => console.error(err));
 }
 
-document.getElementById("submitAttendance").addEventListener("click", () => {
+document.getElementById("attendanceForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const className = document.getElementById("classSelect").value;
   const rows = document.querySelectorAll("#studentsTable tbody tr");
-  const selectedClass = document.getElementById("classSelect").value;
   const attendanceData = [];
 
   rows.forEach(row => {
-    const regNo = row.cells[0].textContent;
-    const name = row.cells[1].textContent;
-    const status = row.cells[3].querySelector("select").value;
-    attendanceData.push([regNo, name, selectedClass, status, new Date().toLocaleString()]);
+    const regNo = row.cells[0].innerText;
+    const name = row.cells[1].innerText;
+    const status = row.querySelector("select").value;
+    attendanceData.push({ regNo, name, status });
   });
 
   fetch(WEB_APP_URL, {
     method: "POST",
-    mode: "cors",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "submitAttendance", data: attendanceData })
+    body: JSON.stringify({
+      action: "submitAttendance",
+      class: className,
+      data: attendanceData
+    }),
+    headers: { "Content-Type": "application/json" }
   })
   .then(res => res.text())
   .then(msg => {
-    document.getElementById("statusMsg").textContent = msg;
-  });
+    alert(msg);
+  })
+  .catch(err => console.error(err));
 });
+
