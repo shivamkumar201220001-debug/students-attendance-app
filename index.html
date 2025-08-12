@@ -1,121 +1,199 @@
 <!doctype html>
 <html>
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Student Attendance</title>
-  <style>
-    body{font-family: Arial, sans-serif; padding:16px; max-width:900px; margin:auto}
-    table{width:100%; border-collapse:collapse}
-    th,td{border:1px solid #ddd; padding:8px; text-align:left}
-    th{background:#f4f4f4}
-    .status{font-size:0.9rem; padding:4px 6px; margin-left:8px}
-    .saving{color:#ff9800}
-    .saved{color:#4caf50}
-    .err{color:#e53935}
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Student Attendance</title>
+<style>
+  :root{--max:900px}
+  body{font-family:Inter, Arial, sans-serif; padding:16px; max-width:var(--max); margin:0 auto; color:#111}
+  h1{margin-top:10px}
+  .controls{display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:12px}
+  select, button{padding:8px 10px; font-size:14px}
+  table{width:100%; border-collapse:collapse; margin-top:8px}
+  th,td{border:1px solid #eee; padding:10px; text-align:left}
+  th{background:#f7f7f7}
+  .status{font-size:0.9rem}
+  .saved{color:green}
+  .err{color:#d32f2f}
+  @media (max-width:640px){
+    table, thead, tbody, th, td, tr{display:block}
+    thead{display:none}
+    tr{margin-bottom:12px; border:1px solid #eee; padding:8px}
+    td{border:0; padding:6px}
+    td.label{font-weight:600; color:#333; width:40%}
+  }
+</style>
 </head>
 <body>
-  <h2>Mark Attendance</h2>
-  <p>Dropdown select karte hi attendance automatically save ho jayega.</p>
+  <h1>Mark Attendance</h1>
+  <p>Select class → mark students → click Submit to save for today.</p>
 
-  <table id="attendanceTable">
-    <thead>
-      <tr>
-        <th>Reg No</th>
-        <th>Name</th>
-        <th>Status</th>
-        <th>Result</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+  <div class="controls">
+    <label>
+      Class:
+      <select id="classSelect"></select>
+    </label>
 
-  <script>
-    // --- Aapka naya Web App URL ---
-    const API_URL = "https://script.google.com/macros/s/AKfycbzNv033grqyA-Xbw5uHT0FkvapQYvw1NSF2PV5d_hKmSik7GHBN4P7CNs9yj2jjexd3/exec";
+    <button id="loadBtn">Load Students</button>
+    <button id="submitBtn" style="background:#1976d2;color:#fff;border:0;border-radius:4px">Submit Attendance</button>
 
-    // Students list load karna
-    async function loadStudents() {
-      try {
-        const res = await fetch(API_URL);
-        if (!res.ok) throw new Error("Fetch failed: " + res.status);
-        const students = await res.json();
-        populateTable(students);
-      } catch (err) {
-        alert("Student list load error: " + err.message);
-        console.error(err);
-      }
+    <div id="msg" style="margin-left:auto"></div>
+  </div>
+
+  <div id="tableWrap">
+    <table id="attendanceTable">
+      <thead>
+        <tr><th>Reg No</th><th>Name</th><th>Status</th><th>Result</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+<script>
+  // --- PUT YOUR DEPLOYED WEB APP URL HERE (after redeploying Apps Script) ---
+  const API_URL = "https://script.google.com/macros/s/AKfycbypYt1uIBdxwmyGOELT819lFVXvKLmKFvyikh3eMTkQCZ4ljFlXMEZzMXk_oTB44qL8/exec";
+  // -----------------------------------------------------------------------
+
+  // List of class tabs (as you provided). Update if needed.
+  const CLASSES = [
+    "8th","9th","9th (2)","10th","10th(P2)",
+    "11th JEE (Morning)","11th JEE (Evening)","11th NEET (Morning)","11th NEET (Evening)",
+    "12th NEET (Morning)","12th NEET (Evening)","12th JEE (Morning)","12th JEE (Evening)",
+    "DROPPER JEE","DROPPER NEET","DROPPER NEET(P2)"
+  ];
+
+  const classSelect = document.getElementById("classSelect");
+  const loadBtn = document.getElementById("loadBtn");
+  const submitBtn = document.getElementById("submitBtn");
+  const msg = document.getElementById("msg");
+  const tbody = document.querySelector("#attendanceTable tbody");
+
+  // Populate class dropdown
+  CLASSES.forEach(c => {
+    const o = document.createElement("option");
+    o.value = c;
+    o.textContent = c;
+    classSelect.appendChild(o);
+  });
+
+  // Load students for selected class
+  async function loadStudents() {
+    const sheet = classSelect.value;
+    setMsg("Loading…");
+    try {
+      const res = await fetch(API_URL + "?sheet=" + encodeURIComponent(sheet));
+      if (!res.ok) throw new Error("Network: " + res.status);
+      const students = await res.json();
+      if (students.error) throw new Error(students.error);
+      populateTable(students);
+      setMsg("Students loaded (" + students.length + ")");
+    } catch (err) {
+      setMsg("Error: " + err.message, true);
+      console.error(err);
     }
+  }
 
-    // Table me students add karna
-    function populateTable(students) {
-      const tbody = document.querySelector("#attendanceTable tbody");
-      tbody.innerHTML = "";
-      students.forEach(s => {
-        const tr = document.createElement("tr");
+  function populateTable(students) {
+    tbody.innerHTML = "";
+    if (!students.length) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = '<td colspan="4">No students found</td>';
+      tbody.appendChild(tr);
+      return;
+    }
+    students.forEach(s => {
+      const tr = document.createElement("tr");
 
-        const tdReg = document.createElement("td");
-        tdReg.textContent = s.regNo;
-        tr.appendChild(tdReg);
+      const tdReg = document.createElement("td");
+      tdReg.textContent = s.regNo;
+      tr.appendChild(tdReg);
 
-        const tdName = document.createElement("td");
-        tdName.textContent = s.name;
-        tr.appendChild(tdName);
+      const tdName = document.createElement("td");
+      tdName.textContent = s.name;
+      tr.appendChild(tdName);
 
-        const tdSelect = document.createElement("td");
-        const select = document.createElement("select");
-        ["Present","Absent"].forEach(v => {
-          const opt = document.createElement("option");
-          opt.value = v;
-          opt.textContent = v;
-          select.appendChild(opt);
-        });
-        tdSelect.appendChild(select);
-        tr.appendChild(tdSelect);
-
-        const tdStatus = document.createElement("td");
-        const span = document.createElement("span");
-        span.className = "status";
-        tdStatus.appendChild(span);
-        tr.appendChild(tdStatus);
-
-        // Dropdown change par auto-save
-        select.addEventListener("change", () => {
-          saveSingle({ regNo: s.regNo, status: select.value }, span);
-        });
-
-        tbody.appendChild(tr);
+      const tdSel = document.createElement("td");
+      const sel = document.createElement("select");
+      ["Present","Absent"].forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = v;
+        opt.textContent = v;
+        sel.appendChild(opt);
       });
-    }
+      tdSel.appendChild(sel);
+      tr.appendChild(tdSel);
 
-    // Attendance save karna
-    async function saveSingle(item, statusElement) {
-      statusElement.textContent = "Saving…";
-      statusElement.className = "status saving";
-      try {
-        const res = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify([item]) // Apps Script array expect karta hai
-        });
-        if (!res.ok) throw new Error("Save failed: " + res.status);
-        const data = await res.json();
-        if (data && data.success) {
-          statusElement.textContent = "✓ Saved";
-          statusElement.className = "status saved";
-        } else {
-          throw new Error("Server error");
-        }
-      } catch (err) {
-        statusElement.textContent = "Error";
-        statusElement.className = "status err";
-        console.error(err);
+      const tdRes = document.createElement("td");
+      tdRes.className = "status";
+      tr.appendChild(tdRes);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Bulk submit
+  async function submitAttendance() {
+    const sheet = classSelect.value;
+    const rows = Array.from(tbody.querySelectorAll("tr"));
+    if (!rows.length) { setMsg("No students to submit", true); return; }
+
+    // Build payload
+    const data = rows.map(r => {
+      const regNo = r.cells[0].textContent.trim();
+      const name = r.cells[1].textContent.trim();
+      const status = r.cells[2].querySelector("select").value;
+      return { regNo, name, status };
+    });
+
+    // Show saving indicator
+    setMsg("Saving…");
+    submitBtn.disabled = true;
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sheet: sheet, data: data })
+      });
+      if (!res.ok) throw new Error("Network: " + res.status);
+      const result = await res.json();
+      if (result && result.success) {
+        setMsg("Saved ✓");
+        // Mark each row as saved
+        rows.forEach(r => r.cells[3].textContent = "✓ Saved");
+      } else {
+        throw new Error(result && result.error ? result.error : "Save failed");
       }
+    } catch (err) {
+      setMsg("Error: " + err.message, true);
+      rows.forEach(r => r.cells[3].textContent = "Error");
+      console.error(err);
+    } finally {
+      submitBtn.disabled = false;
     }
+  }
 
-    // Page load par data fetch
-    loadStudents();
-  </script>
+  function setMsg(t, isErr) {
+    msg.textContent = t || "";
+    msg.style.color = isErr ? "#d32f2f" : "#333";
+  }
+
+  // Events
+  loadBtn.addEventListener("click", loadStudents);
+  submitBtn.addEventListener("click", () => {
+    if (!confirm("Are you sure you want to submit attendance for " + classSelect.value + " ?")) return;
+    submitAttendance();
+  });
+
+  // Optional: auto-load first class on open
+  (function init() {
+    if (classSelect.options.length) {
+      // select a sensible default, e.g., first option
+      classSelect.selectedIndex = 0;
+      // auto-load:
+      // loadStudents();
+    }
+  })();
+</script>
 </body>
 </html>
