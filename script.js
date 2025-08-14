@@ -15,7 +15,7 @@ async function loadClasses() {
     classSelect.innerHTML = sheetNames.map(cls => `<option value="${cls}">${cls}</option>`).join("");
     loadStudents(sheetNames[0]);
   } catch (err) {
-    console.error(err);
+    console.error("Error loading classes", err);
   }
 }
 
@@ -38,7 +38,7 @@ async function loadStudents(className) {
       </tr>
     `).join("");
   } catch (err) {
-    console.error(err);
+    console.error("Error loading students", err);
   }
 }
 
@@ -60,12 +60,17 @@ submitBtn.addEventListener("click", async () => {
   try {
     const res = await fetch(WEB_APP_URL, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ className, attendanceData }),
     });
-    const result = await res.text();
-    statusEl.textContent = "Attendance Submitted Successfully!";
-    statusEl.style.color = "green";
-    console.log(result);
+    const result = await res.json();
+    if (result.status === "success") {
+      statusEl.textContent = "Attendance Submitted Successfully!";
+      statusEl.style.color = "green";
+    } else {
+      statusEl.textContent = "Error submitting attendance.";
+      statusEl.style.color = "red";
+    }
   } catch (err) {
     console.error(err);
     statusEl.textContent = "Error submitting attendance.";
