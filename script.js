@@ -1,6 +1,6 @@
-const API_KEY = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
+const API_KEY = "AIzaSyBZbdgXYIDzotRfsGe3Kw6bhTkrU1nrpfA";
 const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwd-M1jaU_Mu-A9dK5HdaZLj6fYOtk-rMD429BSQiIaVh1S9RjVhJWyQOQlfPV1S9ADPA/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxlZRWWY4Dn8cVq-VmuzSkl27pInxVsj0jhgDLBJwyhHCwsheSQUcXrcUgVKKyKvllIkw/exec";
 
 const classSelect = document.getElementById("classSelect");
 const studentsTableBody = document.querySelector("#studentsTable tbody");
@@ -11,9 +11,12 @@ async function loadClasses() {
   try {
     const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}?key=${API_KEY}`);
     const data = await res.json();
+    console.log("Sheets API Response:", data);
     const sheetNames = data.sheets.map(s => s.properties.title);
     classSelect.innerHTML = sheetNames.map(cls => `<option value="${cls}">${cls}</option>`).join("");
-    loadStudents(sheetNames[0]);
+    if (sheetNames.length > 0) {
+      loadStudents(sheetNames[0]);
+    }
   } catch (err) {
     console.error("Error loading classes", err);
   }
