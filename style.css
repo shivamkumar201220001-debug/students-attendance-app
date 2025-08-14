@@ -1,6 +1,6 @@
 body {
   font-family: Arial, sans-serif;
-  background: #f4f4f4;
+  background: #fff8e7; /* soft cream background */
   margin: 0;
   padding: 0;
 }
@@ -8,55 +8,42 @@ body {
 .container {
   max-width: 900px;
   margin: auto;
-  background: white;
+  background: #ffffff;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-top: 6px solid #d97706; /* saffron top border */
 }
 
 h1 {
   text-align: center;
-  color: #333;
+  color: #7f1d1d; /* deep maroon */
+  margin-bottom: 15px;
+  font-size: 26px;
 }
 
 label {
   font-weight: bold;
+  color: #7f1d1d;
 }
 
 select, button {
-  padding: 8px;
+  padding: 10px;
   margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #d97706;
+  font-size: 14px;
+}
+
+select {
+  background-color: #fff8e7;
+  color: #333;
+}
+
+.table-container {
+  overflow-x: auto;
 }
 
 table {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-table, th, td {
-  border: 1px solid #ddd;
-}
-
-th, td {
-  text-align: center;
-  padding: 8px;
-}
-
-button {
-  background: #28a745;
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-button:hover {
-  background: #218838;
-}
-
-#status {
-  text-align: center;
-  margin-top: 10px;
-  font-weight: bold;
-}
+  bor
