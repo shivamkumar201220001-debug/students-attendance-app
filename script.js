@@ -1,4 +1,4 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJx0qjhRSeo1e00xAkXD4pFDUOpzT7BgmfS_okWz6ObXU5aOLI3-ewKPDkEY6rXvE-g/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzFxMLW1wMiEopjCR12s8eswi0eOq_Diuxu-pPjWOjiKmsgf7uNj9KeFt7MCsK9KaZRUQ/exec";
 const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
 const API_KEY = "AIzaSyBZbdgXYIDzotRfsGe3Kw6bhTkrU1nrpfA";
 
