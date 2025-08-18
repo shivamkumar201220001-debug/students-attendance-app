@@ -1,24 +1,56 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Students Attendance</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Students Attendance</h1>
-  <label>Select Class:</label>
-  <select id="classSelect"></select>
+  <div class="app">
+    <header class="header">
+      <h1>Students Attendance</h1>
+      <p class="sub">Mark daily attendance and save to Google Sheet</p>
+    </header>
 
-  <table id="studentsTable" border="1">
-    <thead>
-      <tr><th>Reg No</th><th>Name</th><th>Attendance</th></tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+    <section class="controls">
+      <div class="field">
+        <label for="classSelect">Select Class</label>
+        <select id="classSelect" class="input"></select>
+      </div>
 
-  <button id="submitAttendance">Submit Attendance</button>
+      <div class="field">
+        <label for="dateInput">Date</label>
+        <input id="dateInput" type="date" class="input" />
+      </div>
+
+      <div class="actions">
+        <button id="reloadBtn" class="btn" type="button">Reload Students</button>
+        <button id="markAllBtn" class="btn outline" type="button">Mark All Present</button>
+      </div>
+    </section>
+
+    <section id="tableWrap" class="table-wrap hidden">
+      <table id="studentsTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Reg. No</th>
+            <th>Name</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="studentsTbody"></tbody>
+      </table>
+    </section>
+
+    <section class="footer-actions">
+      <button id="submitBtn" class="btn primary" type="button">Submit Attendance</button>
+      <span id="countBadge" class="badge">0 students</span>
+    </section>
+
+    <div id="toast" class="toast hidden"></div>
+  </div>
 
   <script src="script.js"></script>
 </body>
