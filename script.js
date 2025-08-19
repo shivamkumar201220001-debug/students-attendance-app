@@ -2,7 +2,7 @@
 
 const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI"; 
 const API_KEY = "AIzaSyBCn-QeQAIMCw2FbC-knJJ3zn3_SI3KDhs"; 
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzPR9Jd-aHAR4WMGm_brB134LZGvHvWUP8bURj0tYkxqVYbcLsf-c1bVPzm4ewAmLTqaQ/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzHIeYhXvHWJ7rDfW5XJzvr1OKafgyTCenzUiZasJ7BAJh_OJcdKngO2YBqiTuSEB-Lfw/exec";
 
 // Classes list
 const classes = [
