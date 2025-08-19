@@ -3,7 +3,7 @@ const API_KEY = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxkcJYJ39fKJWOlZeLsLd3-Hf5tvxoLhlBzrPXqd9WBv7l93b9Lx5Iw5YVrxkjGE2hPZw/exec";
 
 const CLASSES = [
-  "8th", "9th 1st", "9th 2nd", "10th 1st", "10th 2nd",
+  "8th", "9th", "9th 2nd", "10th", "10th 2nd",
   "11th JEE Morning", "11th JEE Evening", "11th NEET Morning", "11th NEET Evening",
   "12th JEE Morning", "12th JEE Evening", "12th NEET Morning", "12th NEET Evening",
   "Dropper NEET", "Dropper NEET 2.0", "Dropper JEE"
