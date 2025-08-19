@@ -1,24 +1,17 @@
-:root{
-  --bg:#f5f7fb;--card:#ffffff;--text:#0f172a;--muted:#475569;
-  --border:#e2e8f0;--accent:#22c55e;--err:#ef4444
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);font-family:system-ui,Segoe UI,Roboto,Arial;color:var(--text)}
-.wrap{max-width:980px;margin:24px auto;padding:16px}
-.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;box-shadow:0 8px 24px rgba(15,23,42,.06)}
-h1{margin:0 0 12px;font-size:24px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:12px}
-.grid .full{grid-column:1/-1}
-label{font-size:12px;color:var(--muted);display:block;margin:4px 0}
-input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#fff}
-button{cursor:pointer}
-.toolbar{display:flex;gap:12px;align-items:center;justify-content:flex-end;margin:12px 0}
-.table{overflow:auto;border:1px solid var(--border);border-radius:12px}
-table{width:100%;border-collapse:collapse}
-th,td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
-th{background:#f8fafc;position:sticky;top:0}
-.actions{display:flex;gap:12px;align-items:center;margin-top:12px}
-#submit{background:#16a34a;color:white;border-color:#15803d}
-.status{font-size:14px}
-.status.ok{color:#166534}
-.status.err{color:#b91c1c}
+body{font-family:Arial,Helvetica,sans-serif;background:#f5f7fa;padding:20px}
+.container{max-width:900px;margin:0 auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,0.06)}
+h1{margin:0 0 14px}
+.form-row{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.form-row label{width:120px;font-weight:600}
+.form-row input, .form-row select{flex:1;padding:8px;border:1px solid #ccc;border-radius:6px}
+#studentsArea{margin-top:16px;border-top:1px solid #eee;padding-top:12px}
+.student-row{display:flex;gap:12px;align-items:center;padding:6px 0;border-bottom:1px dashed #eee}
+.student-row .reg{width:140px;font-weight:600}
+.student-row .name{flex:1}
+.student-row select{padding:6px;border-radius:6px;border:1px solid #ccc}
+.actions{margin-top:16px;display:flex;gap:8px}
+button{padding:8px 12px;border-radius:8px;border:0;background:#2563eb;color:white;cursor:pointer}
+#status{margin-top:10px}
+
+
+@media(max-width:600px){.form-row{flex-direction:column;align-items:flex-start}.form-row label{width:100%}}
