@@ -1,28 +1,46 @@
-<!doctype html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Students Attendance</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-    select { padding: 4px; }
-    button { margin-top: 20px; padding: 10px 20px; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Students Attendance</title>
+<link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Students Attendance</h1>
+<div class="container">
+<h1>Students Attendance</h1>
 
-  <label for="classSelect">Select Class:</label>
-  <select id="classSelect"></select>
-  <button onclick="loadStudents()">Load Students</button>
 
-  <form id="attendanceForm">
-    <table id="studentsTable"></table>
-    <button type="button" onclick="submitAttendance()">Submit Attendance</button>
-  </form>
+<div class="form-row">
+<label>Teacher Name</label>
+<input id="teacherName" placeholder="Enter your name" />
+</div>
 
-  <script src="script.js"></script>
+
+<div class="form-row">
+<label>Class</label>
+<select id="classSelect"></select>
+</div>
+
+
+<div class="form-row">
+<label>Date</label>
+<input id="dateInput" readonly />
+</div>
+
+
+<div id="studentsArea"></div>
+
+
+<div class="actions">
+<button id="loadBtn">Load Students</button>
+<button id="submitBtn">Submit Attendance</button>
+</div>
+
+
+<div id="status"></div>
+</div>
+
+
+<script src="script.js"></script>
 </body>
 </html>
