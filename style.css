@@ -1,75 +1,38 @@
 body {
   font-family: Arial, sans-serif;
-  background: #fff8e7; /* soft cream background */
+  background: #f4f6f9;
   margin: 0;
   padding: 0;
 }
 
 .container {
-  max-width: 900px;
-  margin: auto;
-  background: #ffffff;
+  max-width: 800px;
+  margin: 30px auto;
+  background: white;
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  border-top: 6px solid #d97706; /* saffron */
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 h1 {
   text-align: center;
-  color: #7f1d1d; /* deep maroon */
-  margin-bottom: 15px;
-  font-size: 26px;
+  margin-bottom: 20px;
+  color: #2c3e50;
 }
 
 label {
   font-weight: bold;
-  color: #7f1d1d;
 }
 
 select, button {
   padding: 10px;
   margin: 10px 0;
-  border-radius: 5px;
-  border: 1px solid #d97706;
-  font-size: 14px;
-}
-
-select {
-  background-color: #fff8e7;
-}
-
-.table-container {
-  overflow-x: auto;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-table, th, td {
-  border: 1px solid #d6b14c;
-}
-
-th {
-  background-color: #fcd34d;
-  color: #7f1d1d;
-  font-weight: bold;
-}
-
-td {
-  background-color: #fffdf5;
-}
-
-th, td {
-  text-align: center;
-  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
 button {
-  background: #d97706;
+  background: #2ecc71;
   color: white;
   border: none;
   cursor: pointer;
@@ -77,12 +40,23 @@ button {
 }
 
 button:hover {
-  background: #b45309;
+  background: #27ae60;
 }
 
-#status {
-  text-align: center;
-  margin-top: 10px;
+.student-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.student-row span {
+  flex: 1;
+}
+
+#message {
+  margin-top: 15px;
   font-weight: bold;
-  color: #7f1d1d;
+  text-align: center;
 }
