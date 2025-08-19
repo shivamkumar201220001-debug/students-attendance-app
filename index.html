@@ -1,65 +1,28 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8">
   <title>Students Attendance</title>
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+    select { padding: 4px; }
+    button { margin-top: 20px; padding: 10px 20px; }
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
-      <h1>📚 Students Attendance</h1>
+  <h1>Students Attendance</h1>
 
-      <div class="grid">
-        <div>
-          <label>Teacher Name</label>
-          <input id="teacher" placeholder="Enter your name" />
-        </div>
-        <div>
-          <label>Date</label>
-          <input type="date" id="date" />
-        </div>
-        <div class="full">
-          <label>Class</label>
-          <select id="classSelect">
-            <option value="">Loading classes…</option>
-          </select>
-        </div>
-      </div>
+  <label for="classSelect">Select Class:</label>
+  <select id="classSelect"></select>
+  <button onclick="loadStudents()">Load Students</button>
 
-      <div class="toolbar">
-        <div class="right">
-          <label>Mark all</label>
-          <select id="bulk">
-            <option value="">—</option>
-            <option>Present</option>
-            <option>Absent</option>
-            <option>Leave</option>
-            <option>Holiday</option>
-          </select>
-        </div>
-      </div>
+  <form id="attendanceForm">
+    <table id="studentsTable"></table>
+    <button type="button" onclick="submitAttendance()">Submit Attendance</button>
+  </form>
 
-      <div class="table">
-        <table id="table">
-          <thead>
-            <tr>
-              <th style="width:110px">Reg No</th>
-              <th>Name</th>
-              <th style="width:150px">Attendance</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-
-      <div class="actions">
-        <button id="submit">✅ Submit Attendance</button>
-        <div id="status" class="status"></div>
-      </div>
-    </div>
-  </div>
   <script src="script.js"></script>
 </body>
 </html>
