@@ -1,168 +1,70 @@
-// ==== CONFIG ====
-// 1) After deploying the Apps Script as a Web App, paste URL below:
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwpiSawCPSZV0vDuG_wQ9PzWzYIbBIiE-A7aEVH1yiKlgdmkGxJRbsc1ByhWc9EOckS/exec"; // e.g. https://script.google.com/macros/s/AKfycb.../exec
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw3_8Y9_RON33ZXkLKyp8kVPUzF2F6hsSxDgS89gP1tziSB6XoTCUkWCATPJachI9txlQ/exec";
 
-// ==== UTIL ====
-const $ = (sel) => document.querySelector(sel);
-const fmtDate = (d) => {
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+// Page load → Fetch all classes
+window.onload = async () => {
+  try {
+    let res = await fetch(WEB_APP_URL);
+    let classes = await res.json();
+    let select = document.getElementById("classSelect");
+
+    classes.forEach(cls => {
+      let option = document.createElement("option");
+      option.value = cls;
+      option.textContent = cls;
+      select.appendChild(option);
+    });
+
+    // Jab class select ho → students load karo
+    select.addEventListener("change", loadStudents);
+  } catch (err) {
+    console.error(err);
+  }
 };
-function toast(msg) {
-  const el = $('#toast');
-  el.textContent = msg;
-  el.classList.remove('hidden');
-  setTimeout(() => el.classList.add('hidden'), 2600);
-}
 
-// ==== INIT ====
-window.addEventListener('DOMContentLoaded', async () => {
-  // default date = today
-  $('#dateInput').value = fmtDate(new Date());
-  await loadClasses();
-  bindEvents();
-});
-
-function bindEvents() {
-  $('#reloadBtn').addEventListener('click', loadStudents);
-  $('#classSelect').addEventListener('change', loadStudents);
-  $('#markAllBtn').addEventListener('click', markAllPresent);
-  $('#submitBtn').addEventListener('click', submitAttendance);
-}
-
-async function loadClasses() {
-  try {
-    setLoading(true);
-    const url = `${WEB_APP_URL}?action=classes`;
-    const res = await fetch(url, { method: 'GET' });
-    const data = await res.json();
-    const classes = data.classes || [];
-    const sel = $('#classSelect');
-    sel.innerHTML = '';
-    if (classes.length === 0) {
-      const opt = document.createElement('option');
-      opt.value = '';
-      opt.textContent = 'No classes found';
-      sel.appendChild(opt);
-      toast('No classes found. Check your Sheet tab names.');
-      return;
-    }
-    classes.forEach(cn => {
-      const opt = document.createElement('option');
-      opt.value = cn;
-      opt.textContent = cn;
-      sel.appendChild(opt);
-    });
-    await loadStudents();
-  } catch (e) {
-    console.error(e);
-    toast('Failed to load classes');
-  } finally {
-    setLoading(false);
-  }
-}
-
+// Load students from selected class (from Sheet)
 async function loadStudents() {
-  const className = $('#classSelect').value;
+  let className = document.getElementById("classSelect").value;
   if (!className) return;
-  try {
-    setLoading(true);
-    const url = `${WEB_APP_URL}?action=students&class=${encodeURIComponent(className)}`;
-    const res = await fetch(url, { method: 'GET' });
-    const data = await res.json();
-    const students = data.students || [];
-    const tbody = $('#studentsTbody');
-    tbody.innerHTML = '';
-    students.forEach((s, idx) => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${idx + 1}</td>
-        <td>${s.regNo || ''}</td>
-        <td>${s.name || ''}</td>
-        <td>
-          <select class="status">
-            <option value="Present" selected>Present</option>
-            <option value="Absent">Absent</option>
-            <option value="Leave">Leave</option>
-          </select>
-        </td>
-      `;
-      tr.dataset.regNo = s.regNo || '';
-      tr.dataset.name = s.name || '';
-      tbody.appendChild(tr);
-    });
-    $('#countBadge').textContent = `${students.length} students`;
-    $('#tableWrap').classList.toggle('hidden', students.length === 0);
-    if (students.length === 0) toast('No students in this class tab.');
-  } catch (e) {
-    console.error(e);
-    toast('Failed to load students');
-  } finally {
-    setLoading(false);
-  }
-}
 
-function markAllPresent() {
-  document.querySelectorAll('select.status').forEach(sel => {
-    sel.value = 'Present';
+  let res = await fetch(`${WEB_APP_URL}?class=${className}`);
+  let students = await res.json();
+
+  let container = document.getElementById("studentsContainer");
+  container.innerHTML = "";
+
+  students.forEach(stu => {
+    let row = document.createElement("div");
+    row.className = "student-row";
+    row.innerHTML = `
+      <span>${stu.regNo} - ${stu.name}</span>
+      <select data-regno="${stu.regNo}">
+        <option value="Present">Present</option>
+        <option value="Absent">Absent</option>
+        <option value="Leave">Leave</option>
+      </select>
+    `;
+    container.appendChild(row);
   });
-  toast('All marked Present');
 }
 
-async function submitAttendance() {
-  const className = $('#classSelect').value;
-  const dateVal = $('#dateInput').value;
-  if (!WEB_APP_URL || WEB_APP_URL.includes('PASTE_YOUR_WEB_APP_URL_HERE')) {
-    toast('Please set WEB_APP_URL in script.js');
-    return;
-  }
-  if (!className) { toast('Select a class'); return; }
-  if (!dateVal) { toast('Select a date'); return; }
+// Submit attendance
+document.getElementById("submitBtn").addEventListener("click", async () => {
+  let className = document.getElementById("classSelect").value;
+  let selects = document.querySelectorAll("#studentsContainer select");
 
-  const rows = Array.from(document.querySelectorAll('#studentsTbody tr'));
-  const records = rows.map(r => ({
-    date: dateVal,
-    class: className,
-    regNo: r.dataset.regNo || '',
-    name: r.dataset.name || '',
-    status: r.querySelector('select.status').value
-  }));
-
-  if (records.length === 0) { toast('No students to submit'); return; }
-
-  try {
-    setLoading(true);
-    toggleSubmit(true);
-    const res = await fetch(WEB_APP_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ records })
+  let attendanceData = [];
+  selects.forEach(sel => {
+    attendanceData.push({
+      regNo: sel.getAttribute("data-regno"),
+      attendance: sel.value
     });
-    const data = await res.json();
-    if (data.success) {
-      toast(`Saved ✅ (${data.saved || records.length})`);
-    } else {
-      toast('Save failed');
-    }
-  } catch (e) {
-    console.error(e);
-    toast('Save error');
-  } finally {
-    toggleSubmit(false);
-    setLoading(false);
-  }
-}
+  });
 
-function toggleSubmit(disabled) {
-  const btn = $('#submitBtn');
-  btn.disabled = disabled;
-  btn.textContent = disabled ? 'Saving…' : 'Submit Attendance';
-}
+  let res = await fetch(WEB_APP_URL, {
+    method: "POST",
+    body: JSON.stringify({ className, attendance: attendanceData })
+  });
 
-function setLoading(isLoading) {
-  $('#reloadBtn').disabled = isLoading;
-  $('#classSelect').disabled = isLoading;
-  $('#markAllBtn').disabled = isLoading;
-}
-
-// End of script.js
+  let msg = await res.text();
+  document.getElementById("message").innerText = msg === "Success" ? "✅ Attendance Saved!" : "❌ Error Saving!";
+});
