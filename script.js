@@ -1,4 +1,4 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwS9hkozd20Jb1mIdCroaJuojwdqpKZRzT_J1AXK0rWBE1lewAvmeS5Mb_3qFdx9nCwdA/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz_Wa2bg1ztjKck4Ag3fZi0VsGEP7vsVRGkYt-MTfalUnc-X2CIE_WgQdmsCxna_W8SvA/exec";
 
 const CLASSES = [
   "8th", "9th", "9th 2nd", "10th", "10th 2nd",
