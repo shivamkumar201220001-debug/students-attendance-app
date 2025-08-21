@@ -1,6 +1,4 @@
-const SHEET_ID = "1qeHqI_WgkE7mmsWs1vwOQnKvtXojoH-TVXaQ0FcVMLI";
-const API_KEY = "AIzaSyBoQWKF1OjHI-rDK7BjFZHmhCyxvEx5XS8";
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxkcJYJ39fKJWOlZeLsLd3-Hf5tvxoLhlBzrPXqd9WBv7l93b9Lx5Iw5YVrxkjGE2hPZw/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzlZXL3EsjGBqZBj2aUVfeCnFADrojpBI_S8uQQ-uPvYXmF5oRONRZzCovlb3sfeKC7IA/exec";
 
 const CLASSES = [
   "8th", "9th", "9th 2nd", "10th", "10th 2nd",
@@ -20,7 +18,10 @@ const statusDiv = document.getElementById('status');
 
 // Populate classes
 CLASSES.forEach(c => {
-  const opt = document.createElement('option'); opt.value = c; opt.textContent = c; classSelect.appendChild(opt);
+  const opt = document.createElement('option'); 
+  opt.value = c; 
+  opt.textContent = c; 
+  classSelect.appendChild(opt);
 });
 
 // Date default (MM/DD/YYYY)
@@ -32,54 +33,72 @@ function formatDateMMDDYYYY(d){
 }
 dateInput.value = formatDateMMDDYYYY(new Date());
 
-// Load students from sheet (reads columns A (Reg No) and B (Name))
+// Load students (via Apps Script GET)
 async function loadStudents(){
-  const sheetName = encodeURIComponent(classSelect.value);
-  const range = `${sheetName}!A2:B`;
-  const url = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${range}?key=${API_KEY}`;
+  const sheetName = classSelect.value;
   statusDiv.textContent = 'Loading students...';
   studentsArea.innerHTML = '';
   try{
-    const res = await fetch(url);
+    const res = await fetch(`${WEB_APP_URL}?class=${encodeURIComponent(sheetName)}`);
     const data = await res.json();
-    const values = data.values || [];
-    if(values.length === 0){ statusDiv.textContent = 'No students found on sheet for this class.'; return; }
 
-    // build UI
-    values.forEach(row => {
-      const reg = row[0] || '';
-      const name = row[1] || '';
+    if(!data.length){ 
+      statusDiv.textContent = 'No students found on sheet for this class.'; 
+      return; 
+    }
+
+    // Build UI
+    data.forEach(st => {
       const div = document.createElement('div'); div.className='student-row';
-      const regDiv = document.createElement('div'); regDiv.className='reg'; regDiv.textContent = reg;
-      const nameDiv = document.createElement('div'); nameDiv.className='name'; nameDiv.textContent = name;
+      const regDiv = document.createElement('div'); regDiv.className='reg'; regDiv.textContent = st.regNo;
+      const nameDiv = document.createElement('div'); nameDiv.className='name'; nameDiv.textContent = st.name;
       const sel = document.createElement('select');
-      ['P','A',' '].forEach(v => { const o=document.createElement('option'); o.value=v; o.textContent = v===' ' ? 'Select' : (v==='P' ? 'Present' : 'Absent'); sel.appendChild(o); });
-      sel.value = ' ';
-      sel.dataset.reg = reg;
-      div.appendChild(regDiv); div.appendChild(nameDiv); div.appendChild(sel);
+      ['','P','A'].forEach(v => { 
+        const o=document.createElement('option'); 
+        o.value=v; 
+        o.textContent = v==='' ? 'Select' : (v==='P' ? 'Present' : 'Absent'); 
+        sel.appendChild(o); 
+      });
+      sel.value = '';
+      sel.dataset.reg = st.regNo;
+      div.appendChild(regDiv); 
+      div.appendChild(nameDiv); 
+      div.appendChild(sel);
       studentsArea.appendChild(div);
     });
-    statusDiv.textContent = `Loaded ${values.length} students.`;
+    statusDiv.textContent = `Loaded ${data.length} students.`;
   }catch(err){
-    console.error(err); statusDiv.textContent = 'Error loading students: ' + err.message;
+    console.error(err); 
+    statusDiv.textContent = 'Error loading students: ' + err.message;
   }
 }
 
 loadBtn.addEventListener('click', loadStudents);
 
-// Submit attendance
+// Submit attendance (via Apps Script POST)
 submitBtn.addEventListener('click', async ()=>{
   const teacher = teacherName.value.trim();
   if(!teacher){ alert('Please enter teacher name'); return; }
+
   const date = dateInput.value;
   const selects = Array.from(document.querySelectorAll('.student-row select'));
-  const attendance = selects.map(s => ({ reg: s.dataset.reg, status: s.value===' ' ? '' : s.value }));
+  const attendance = selects.map(s => ({
+    regNo: s.dataset.reg, 
+    status: s.value || ''
+  }));
 
-  // Validate
-  if(!attendance.length){ alert('No students loaded. Please load students for the selected class.'); return; }
-  if(!attendance.some(a => a.status)){ if(!confirm('No student marked. Submit empty?')) return; }
+  if(!attendance.length){ 
+    alert('No students loaded. Please load students for the selected class.'); 
+    return; 
+  }
 
-  const payload = { date, class: classSelect.value, teacher, attendance };
+  const payload = { 
+    className: classSelect.value, 
+    date: date, 
+    teacher: teacher, 
+    attendance: attendance 
+  };
+
   statusDiv.textContent = 'Submitting attendance...';
   try{
     const res = await fetch(WEB_APP_URL, {
@@ -90,9 +109,15 @@ submitBtn.addEventListener('click', async ()=>{
     const text = await res.text();
     statusDiv.textContent = 'Response: ' + text;
   }catch(err){
-    console.error(err); statusDiv.textContent = 'Submit failed: ' + err.message;
+    console.error(err); 
+    statusDiv.textContent = 'Submit failed: ' + err.message;
   }
 });
 
 // Auto-load students for first class on open
-window.addEventListener('load', ()=>{ if(classSelect.options.length) { classSelect.selectedIndex = 0; loadStudents(); } });
+window.addEventListener('load', ()=>{ 
+  if(classSelect.options.length) { 
+    classSelect.selectedIndex = 0; 
+    loadStudents(); 
+  } 
+});
