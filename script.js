@@ -1,5 +1,5 @@
 // ⚡ Yahan apna Google Apps Script Web App URL daalna hai
-const WEB_APP_URL = "YOUR_WEB_APP_URL_HERE";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbydW6uNf829hygKZ3DmgTMO63zyWOH-Q-ahT3ZDoMfGKHgtSWLgqXiAieSzOx4RoMzzBg/exec";
 
 // Load Students Data
 async function loadStudents() {
