@@ -1,123 +1,79 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx8MboCAviLZ-t7XhqMO9LELw4yLT9BpHFv4m6qwKCqKyZt2-1hmIv-WVhSWlJ25Gy1NA/exec";
+// ⚠️ अपना Apps Script URL यहाँ डालो
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwjhzWFDf2YHunRDNlgZ-PeflY943Z-FxUwHwk4RsV0q1BhC7rwjvMrjl7z5giixErW-w/exec";
 
-const CLASSES = [
-  "8th", "9th", "9th 2nd", "10th", "10th 2nd",
-  "11th JEE Morning", "11th JEE Evening", "11th NEET Morning", "11th NEET Evening",
-  "12th JEE Morning", "12th JEE Evening", "12th NEET Morning", "12th NEET Evening",
-  "Dropper NEET", "Dropper NEET 2.0", "Dropper JEE"
-];
+// Page load par class list fetch
+window.onload = async function () {
+  try {
+    let res = await fetch(WEB_APP_URL);
+    let classes = await res.json();
 
-// DOM
-const classSelect = document.getElementById('classSelect');
-const loadBtn = document.getElementById('loadBtn');
-const studentsArea = document.getElementById('studentsArea');
-const dateInput = document.getElementById('dateInput');
-const teacherName = document.getElementById('teacherName');
-const submitBtn = document.getElementById('submitBtn');
-const statusDiv = document.getElementById('status');
+    let classSelect = document.getElementById("classSelect");
+    classes.forEach(cls => {
+      let option = document.createElement("option");
+      option.value = cls;
+      option.textContent = cls;
+      classSelect.appendChild(option);
+    });
+  } catch (err) {
+    console.error("Error loading classes:", err);
+  }
+};
 
-// Populate classes
-CLASSES.forEach(c => {
-  const opt = document.createElement('option'); 
-  opt.value = c; 
-  opt.textContent = c; 
-  classSelect.appendChild(opt);
-});
+// Students load function
+async function loadStudents() {
+  let className = document.getElementById("classSelect").value;
+  if (!className) return alert("Please select a class");
 
-// Date default (MM/DD/YYYY)
-function formatDateMMDDYYYY(d){
-  const mm = String(d.getMonth()+1).padStart(2,'0');
-  const dd = String(d.getDate()).padStart(2,'0');
-  const yy = d.getFullYear();
-  return `${mm}/${dd}/${yy}`;
+  try {
+    let res = await fetch(`${WEB_APP_URL}?class=${className}`);
+    let data = await res.json();
+
+    document.getElementById("dateHeading").innerText = `Attendance Date: ${data.date}`;
+    let form = document.getElementById("attendanceForm");
+    form.innerHTML = "";
+
+    data.students.forEach(st => {
+      let row = document.createElement("div");
+      row.className = "student-row";
+      row.innerHTML = `
+        <span>${st.regNo} - ${st.name}</span>
+        <select name="${st.regNo}">
+          <option value="Present">Present</option>
+          <option value="Absent">Absent</option>
+        </select>
+      `;
+      form.appendChild(row);
+    });
+  } catch (err) {
+    console.error("Error loading students:", err);
+  }
 }
-dateInput.value = formatDateMMDDYYYY(new Date());
 
-// Load students (via Apps Script GET)
-async function loadStudents(){
-  const sheetName = classSelect.value;
-  statusDiv.textContent = 'Loading students...';
-  studentsArea.innerHTML = '';
-  try{
-    const res = await fetch(`${WEB_APP_URL}?class=${encodeURIComponent(sheetName)}`);
-    const data = await res.json();
+// Attendance submit function
+async function submitAttendance() {
+  let className = document.getElementById("classSelect").value;
+  let form = document.getElementById("attendanceForm");
+  let attendance = [];
 
-    if(!data.length){ 
-      statusDiv.textContent = 'No students found on sheet for this class.'; 
-      return; 
-    }
-
-    // Build UI
-    data.forEach(st => {
-      const div = document.createElement('div'); div.className='student-row';
-      const regDiv = document.createElement('div'); regDiv.className='reg'; regDiv.textContent = st.regNo;
-      const nameDiv = document.createElement('div'); nameDiv.className='name'; nameDiv.textContent = st.name;
-      const sel = document.createElement('select');
-      ['','P','A'].forEach(v => { 
-        const o=document.createElement('option'); 
-        o.value=v; 
-        o.textContent = v==='' ? 'Select' : (v==='P' ? 'Present' : 'Absent'); 
-        sel.appendChild(o); 
+  [...form.elements].forEach(el => {
+    if (el.tagName === "SELECT") {
+      attendance.push({
+        regNo: el.name,
+        status: el.value
       });
-      sel.value = '';
-      sel.dataset.reg = st.regNo;
-      div.appendChild(regDiv); 
-      div.appendChild(nameDiv); 
-      div.appendChild(sel);
-      studentsArea.appendChild(div);
+    }
+  });
+
+  try {
+    let res = await fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify({ className, attendance }),
     });
-    statusDiv.textContent = `Loaded ${data.length} students.`;
-  }catch(err){
-    console.error(err); 
-    statusDiv.textContent = 'Error loading students: ' + err.message;
+
+    let text = await res.text();
+    document.getElementById("message").innerText = text;
+  } catch (err) {
+    console.error("Error submitting attendance:", err);
+    document.getElementById("message").innerText = "Error submitting attendance!";
   }
 }
-
-loadBtn.addEventListener('click', loadStudents);
-
-// Submit attendance (via Apps Script POST)
-submitBtn.addEventListener('click', async ()=>{
-  const teacher = teacherName.value.trim();
-  if(!teacher){ alert('Please enter teacher name'); return; }
-
-  const date = dateInput.value;
-  const selects = Array.from(document.querySelectorAll('.student-row select'));
-  const attendance = selects.map(s => ({
-    regNo: s.dataset.reg, 
-    status: s.value || ''
-  }));
-
-  if(!attendance.length){ 
-    alert('No students loaded. Please load students for the selected class.'); 
-    return; 
-  }
-
-  const payload = { 
-    className: classSelect.value, 
-    date: date, 
-    teacher: teacher, 
-    attendance: attendance 
-  };
-
-  statusDiv.textContent = 'Submitting attendance...';
-  try{
-    const res = await fetch(WEB_APP_URL, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify(payload)
-    });
-    const text = await res.text();
-    statusDiv.textContent = 'Response: ' + text;
-  }catch(err){
-    console.error(err); 
-    statusDiv.textContent = 'Submit failed: ' + err.message;
-  }
-});
-
-// Auto-load students for first class on open
-window.addEventListener('load', ()=>{ 
-  if(classSelect.options.length) { 
-    classSelect.selectedIndex = 0; 
-    loadStudents(); 
-  } 
-});
