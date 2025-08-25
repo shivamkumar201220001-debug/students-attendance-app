@@ -1,40 +1,43 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Students Attendance</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students Attendance App</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+        th { background-color: #f2f2f2; }
+        select, input[type="date"], button { padding: 8px; margin: 5px; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>📒 Students Attendance</h1>
+    <h1>Students Attendance App</h1>
+
+    <label for="attendanceDate">Select Date:</label>
+    <input type="date" id="attendanceDate">
+
+    <br><br>
 
     <label for="classSelect">Select Class:</label>
     <select id="classSelect">
-      <option value="">-- Select Class --</option>
-      <option value="8th">8th</option>
-      <option value="9th 1st">9th 1st</option>
-      <option value="9th 2nd">9th 2nd</option>
-      <option value="10th 1st">10th 1st</option>
-      <option value="10th 2nd">10th 2nd</option>
-      <option value="11th JEE Morning">11th JEE Morning</option>
-      <option value="11th JEE Evening">11th JEE Evening</option>
-      <option value="11th NEET Morning">11th NEET Morning</option>
-      <option value="11th NEET Evening">11th NEET Evening</option>
-      <option value="12th JEE Morning">12th JEE Morning</option>
-      <option value="12th JEE Evening">12th JEE Evening</option>
-      <option value="12th NEET Morning">12th NEET Morning</option>
-      <option value="12th NEET Evening">12th NEET Evening</option>
-      <option value="Dropper NEET">Dropper NEET</option>
-      <option value="Dropper NEET 2.0">Dropper NEET 2.0</option>
+        <option value="">--Select Class--</option>
     </select>
 
-    <div id="studentsContainer"></div>
+    <table id="studentsTable">
+        <thead>
+            <tr>
+                <th>Reg. No</th>
+                <th>Student Name</th>
+                <th>Attendance</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 
     <button id="submitBtn">Submit Attendance</button>
-  </div>
 
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
