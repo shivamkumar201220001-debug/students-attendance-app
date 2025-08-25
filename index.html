@@ -1,46 +1,26 @@
-<html>
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Students Attendance</title>
-<link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Students Attendance</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container">
-<h1>Students Attendance</h1>
+  <div class="container">
+    <h1>📘 Students Attendance</h1>
 
+    <label for="classSelect">Select Class:</label>
+    <select id="classSelect"></select>
+    <button onclick="loadStudents()">Load Students</button>
 
-<div class="form-row">
-<label>Teacher Name</label>
-<input id="teacherName" placeholder="Enter your name" />
-</div>
+    <h2 id="dateHeading"></h2>
+    <form id="attendanceForm"></form>
 
+    <button onclick="submitAttendance()">Submit Attendance</button>
+    <p id="message"></p>
+  </div>
 
-<div class="form-row">
-<label>Class</label>
-<select id="classSelect"></select>
-</div>
-
-
-<div class="form-row">
-<label>Date</label>
-<input id="dateInput" readonly />
-</div>
-
-
-<div id="studentsArea"></div>
-
-
-<div class="actions">
-<button id="loadBtn">Load Students</button>
-<button id="submitBtn">Submit Attendance</button>
-</div>
-
-
-<div id="status"></div>
-</div>
-
-
-<script src="script.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
