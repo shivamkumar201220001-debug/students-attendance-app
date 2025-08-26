@@ -1,9 +1,9 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Attendance App</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Students Attendance</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -18,13 +18,12 @@
 
     <button onclick="loadStudents()">Load Students</button>
 
-    <div id="studentsContainer"></div>
-
-    <button id="saveBtn" onclick="submitAttendance()" style="display:none;">
-      Save Attendance
-    </button>
+    <div id="studentsSection" style="display:none;">
+      <h2>Mark Attendance</h2>
+      <form id="attendanceForm"></form>
+      <button onclick="submitAttendance()">Submit Attendance</button>
+    </div>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>
