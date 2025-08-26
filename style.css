@@ -1,14 +1,13 @@
 body {
   font-family: Arial, sans-serif;
-  background: #f4f6f9;
+  background: #f5f5f5;
   margin: 0;
   padding: 0;
 }
 
 .container {
-  width: 90%;
-  max-width: 800px;
-  margin: 20px auto;
+  max-width: 480px;
+  margin: auto;
   padding: 20px;
   background: white;
   border-radius: 12px;
@@ -17,44 +16,44 @@ body {
 
 h1 {
   text-align: center;
-  color: #2c3e50;
+  color: #333;
 }
 
 label {
+  display: block;
+  margin-top: 10px;
   font-weight: bold;
 }
 
-select, button {
-  margin: 10px 0;
-  padding: 8px;
-  font-size: 14px;
-}
-
-table {
+input, select, button {
   width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-}
-
-th, td {
-  border: 1px solid #ddd;
   padding: 10px;
-  text-align: center;
-}
-
-th {
-  background: #3498db;
-  color: white;
+  margin-top: 5px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
 button {
-  background: #3498db;
+  background: #4CAF50;
   color: white;
   border: none;
-  border-radius: 6px;
+  margin-top: 15px;
+  font-size: 16px;
   cursor: pointer;
 }
 
 button:hover {
-  background: #2980b9;
+  background: #45a049;
+}
+
+.student {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+}
+
+.status select {
+  padding: 5px;
 }
