@@ -1,5 +1,5 @@
 // ⚠️ Apna Google Apps Script Web App URL yaha daalo
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxD27iAFsvdszc4IMO3EmIg1eK80shgpuF3EN85YKu9DZZ8nSUxodLXVrv8J9In2rhtLg/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw1Nn6X38kweNZBWcflBjYG_ErxXEtHFk91ZgEUhKLLE9XTmtO15ntS_fwJLPNv5YCXnw/exec";
 
 async function loadStudents() {
   const className = document.getElementById("classSelect").value;
