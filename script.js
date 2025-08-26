@@ -1,94 +1,58 @@
-// ⚠️ Apna Google Apps Script Web App URL yaha daalo
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw1Nn6X38kweNZBWcflBjYG_ErxXEtHFk91ZgEUhKLLE9XTmtO15ntS_fwJLPNv5YCXnw/exec";
-
-async function loadStudents() {
+function loadStudents() {
   const className = document.getElementById("classSelect").value;
-  const teacher = document.getElementById("teacherName").value.trim();
-
-  if (!teacher) {
-    alert("Please enter Teacher Name");
-    return;
-  }
-
   if (!className) {
-    alert("Please select a class");
+    alert("Please select a class!");
     return;
   }
 
-  try {
-    const res = await fetch(`${WEB_APP_URL}?class=${encodeURIComponent(className)}`);
-    const data = await res.json();
+  google.script.run.withSuccessHandler(function(students) {
+    const form = document.getElementById("attendanceForm");
+    form.innerHTML = "";
 
-    const container = document.getElementById("studentsContainer");
-    container.innerHTML = "";
-
-    if (!data.students || data.students.length === 0) {
-      container.innerHTML = "<p>No students found for this class.</p>";
+    if (students.length === 0) {
+      form.innerHTML = "<p>No students found for this class.</p>";
       return;
     }
 
-    data.students.forEach(st => {
+    document.getElementById("studentsSection").style.display = "block";
+
+    students.forEach(stu => {
       const div = document.createElement("div");
-      div.className = "student";
       div.innerHTML = `
-        <span>${st.regNo} - ${st.name}</span>
-        <div class="status">
-          <select data-reg="${st.regNo}">
-            <option value="P">Present</option>
-            <option value="A">Absent</option>
-          </select>
-        </div>
+        <label>${stu.regNo} - ${stu.name}</label>
+        <select id="status-${stu.regNo}">
+          <option value="Present">Present</option>
+          <option value="Absent">Absent</option>
+        </select>
       `;
-      container.appendChild(div);
+      form.appendChild(div);
     });
-
-    document.getElementById("saveBtn").style.display = "block";
-  } catch (err) {
-    alert("Error loading students: " + err);
-  }
+  }).getStudents(className);
 }
 
-async function submitAttendance() {
+function submitAttendance() {
+  const teacherName = document.getElementById("teacherName").value.trim();
   const className = document.getElementById("classSelect").value;
-  const teacher = document.getElementById("teacherName").value.trim();
-  const date = new Date();
 
-  const selects = document.querySelectorAll("#studentsContainer select");
-  const entries = Array.from(selects).map(sel => ({
-    regNo: sel.getAttribute("data-reg"),
-    status: sel.value
-  }));
-
-  try {
-    const res = await fetch(WEB_APP_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        className,
-        teacher,
-        date,
-        entries
-      })
-    });
-    const result = await res.json();
-
-    if (result.ok) {
-      alert("Attendance saved successfully!");
-    } else {
-      alert("Error: " + JSON.stringify(result));
-    }
-  } catch (err) {
-    alert("Failed to save: " + err);
+  if (!teacherName || !className) {
+    alert("Please enter teacher name and select class.");
+    return;
   }
-}
 
-// ⚡ Classes ko hardcode karo ya backend se bhi fetch kar sakte ho
-window.onload = () => {
-  const classes = ["8th", "9th 1st", "9th 2nd", "10th 1st", "10th 2nd", "11th JEE Morning", "11th JEE Evening"];
-  const select = document.getElementById("classSelect");
-  classes.forEach(c => {
-    const opt = document.createElement("option");
-    opt.value = c;
-    opt.textContent = c;
-    select.appendChild(opt);
-  });
-};
+  google.script.run.withSuccessHandler(function(students) {
+    const attendanceList = students.map(stu => {
+      const status = document.getElementById("status-" + stu.regNo).value;
+      return {
+        regNo: stu.regNo,
+        name: stu.name,
+        status: status
+      };
+    });
+
+    google.script.run.withSuccessHandler(function(msg) {
+      alert(msg);
+      document.getElementById("studentsSection").style.display = "none";
+    }).submitAttendance(className, teacherName, attendanceList);
+
+  }).getStudents(className);
+}
