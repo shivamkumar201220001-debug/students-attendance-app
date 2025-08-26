@@ -1,55 +1,94 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx_K1oWv0xaXd6dQiZFXqQYRppq_VJGlCDh2ci5DSVcntuOcONZhbvfjhwl3MgQ23bprw/exec";  // अपना deployed URL डालो
-
-document.getElementById("loadBtn").addEventListener("click", loadStudents);
-document.getElementById("attendanceForm").addEventListener("submit", submitAttendance);
+// ⚠️ Apna Google Apps Script Web App URL yaha daalo
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby9FYbSGrYckaUpXC0fp6yR-PJGCNifyGQNLykpE16H05_sZnFozUf36s1pB1Y6BEeg/exec";
 
 async function loadStudents() {
   const className = document.getElementById("classSelect").value;
-  const res = await fetch(`${WEB_APP_URL}?class=${encodeURIComponent(className)}`);
-  const students = await res.json();
+  const teacher = document.getElementById("teacherName").value.trim();
 
-  const tableBody = document.getElementById("studentsTable");
-  tableBody.innerHTML = "";
-
-  if (students.error) {
-    tableBody.innerHTML = `<tr><td colspan="3">${students.error}</td></tr>`;
+  if (!teacher) {
+    alert("Please enter Teacher Name");
     return;
   }
 
-  students.forEach(student => {
-    let row = `
-      <tr>
-        <td>${student.regNo || "N/A"}</td>
-        <td>${student.name}</td>
-        <td>
-          <select data-regno="${student.regNo}" data-name="${student.name}" data-class="${student.class}">
-            <option value="P">P</option>
-            <option value="A">A</option>
-          </select>
-        </td>
-      </tr>
-    `;
-    tableBody.innerHTML += row;
-  });
-}
-
-async function submitAttendance(e) {
-  e.preventDefault();
-  const selects = document.querySelectorAll("#studentsTable select");
-
-  for (let sel of selects) {
-    const data = {
-      regNo: sel.getAttribute("data-regno"),
-      name: sel.getAttribute("data-name"),
-      class: sel.getAttribute("data-class"),
-      attendance: sel.value
-    };
-
-    await fetch(WEB_APP_URL, {
-      method: "POST",
-      body: JSON.stringify(data)
-    });
+  if (!className) {
+    alert("Please select a class");
+    return;
   }
 
-  alert("Attendance submitted successfully!");
+  try {
+    const res = await fetch(`${WEB_APP_URL}?class=${encodeURIComponent(className)}`);
+    const data = await res.json();
+
+    const container = document.getElementById("studentsContainer");
+    container.innerHTML = "";
+
+    if (!data.students || data.students.length === 0) {
+      container.innerHTML = "<p>No students found for this class.</p>";
+      return;
+    }
+
+    data.students.forEach(st => {
+      const div = document.createElement("div");
+      div.className = "student";
+      div.innerHTML = `
+        <span>${st.regNo} - ${st.name}</span>
+        <div class="status">
+          <select data-reg="${st.regNo}">
+            <option value="P">Present</option>
+            <option value="A">Absent</option>
+          </select>
+        </div>
+      `;
+      container.appendChild(div);
+    });
+
+    document.getElementById("saveBtn").style.display = "block";
+  } catch (err) {
+    alert("Error loading students: " + err);
+  }
 }
+
+async function submitAttendance() {
+  const className = document.getElementById("classSelect").value;
+  const teacher = document.getElementById("teacherName").value.trim();
+  const date = new Date();
+
+  const selects = document.querySelectorAll("#studentsContainer select");
+  const entries = Array.from(selects).map(sel => ({
+    regNo: sel.getAttribute("data-reg"),
+    status: sel.value
+  }));
+
+  try {
+    const res = await fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify({
+        className,
+        teacher,
+        date,
+        entries
+      })
+    });
+    const result = await res.json();
+
+    if (result.ok) {
+      alert("Attendance saved successfully!");
+    } else {
+      alert("Error: " + JSON.stringify(result));
+    }
+  } catch (err) {
+    alert("Failed to save: " + err);
+  }
+}
+
+// ⚡ Classes ko hardcode karo ya backend se bhi fetch kar sakte ho
+window.onload = () => {
+  const classes = ["8th", "9th 1st", "9th 2nd", "10th 1st", "10th 2nd", "11th JEE Morning", "11th JEE Evening"];
+  const select = document.getElementById("classSelect");
+  classes.forEach(c => {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    select.appendChild(opt);
+  });
+};
