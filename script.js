@@ -1,58 +1,56 @@
-function loadStudents() {
-  const className = document.getElementById("classSelect").value;
-  if (!className) {
-    alert("Please select a class!");
-    return;
-  }
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxYHL2Xh1Kngx6vxPCuDoqz6xWRLnPWzGq_o3kIm5A1dGDtaA46tdxPLipHn-3JJEGkhg/exec"; // apna Apps Script deploy URL daalo
 
-  google.script.run.withSuccessHandler(function(students) {
-    const form = document.getElementById("attendanceForm");
-    form.innerHTML = "";
+document.addEventListener("DOMContentLoaded", async () => {
+  const classSelect = document.getElementById("classSelect");
 
-    if (students.length === 0) {
-      form.innerHTML = "<p>No students found for this class.</p>";
-      return;
+  // Fetch class list
+  try {
+    let res = await fetch(`${WEB_APP_URL}?action=getClasses`);
+    let data = await res.json();
+
+    if (data.classes) {
+      data.classes.forEach(cls => {
+        let option = document.createElement("option");
+        option.value = cls;
+        option.textContent = cls;
+        classSelect.appendChild(option);
+      });
     }
-
-    document.getElementById("studentsSection").style.display = "block";
-
-    students.forEach(stu => {
-      const div = document.createElement("div");
-      div.innerHTML = `
-        <label>${stu.regNo} - ${stu.name}</label>
-        <select id="status-${stu.regNo}">
-          <option value="Present">Present</option>
-          <option value="Absent">Absent</option>
-        </select>
-      `;
-      form.appendChild(div);
-    });
-  }).getStudents(className);
-}
-
-function submitAttendance() {
-  const teacherName = document.getElementById("teacherName").value.trim();
-  const className = document.getElementById("classSelect").value;
-
-  if (!teacherName || !className) {
-    alert("Please enter teacher name and select class.");
-    return;
+  } catch (err) {
+    console.error("Error loading classes:", err);
   }
+});
 
-  google.script.run.withSuccessHandler(function(students) {
-    const attendanceList = students.map(stu => {
-      const status = document.getElementById("status-" + stu.regNo).value;
-      return {
-        regNo: stu.regNo,
-        name: stu.name,
-        status: status
-      };
-    });
+// Fetch students when class selected
+async function loadStudents() {
+  const classSelect = document.getElementById("classSelect").value;
+  const studentList = document.getElementById("studentList");
+  studentList.innerHTML = "";
 
-    google.script.run.withSuccessHandler(function(msg) {
-      alert(msg);
-      document.getElementById("studentsSection").style.display = "none";
-    }).submitAttendance(className, teacherName, attendanceList);
+  if (!classSelect) return;
 
-  }).getStudents(className);
+  try {
+    let res = await fetch(`${WEB_APP_URL}?action=getStudents&class=${encodeURIComponent(classSelect)}`);
+    let data = await res.json();
+
+    if (data.students && data.students.length > 0) {
+      data.students.forEach(stu => {
+        let row = document.createElement("div");
+        row.className = "student-row";
+        row.innerHTML = `
+          <span>${stu.regno}</span>
+          <span>${stu.name}</span>
+          <select>
+            <option value="Present">Present</option>
+            <option value="Absent">Absent</option>
+          </select>
+        `;
+        studentList.appendChild(row);
+      });
+    } else {
+      studentList.innerHTML = "<p>No students found.</p>";
+    }
+  } catch (err) {
+    console.error("Error loading students:", err);
+  }
 }
