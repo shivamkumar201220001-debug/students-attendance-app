@@ -1,5 +1,5 @@
 /***** CONFIG *****/
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxrnYGCz8HZmMYZTj_mCKcRjCkNQ3819jG7FFpnZJ92NH3onWwSxGQeBTLkC8bgHzXaJw/exec"; // e.g., https://script.google.com/macros/s/XXX/exec
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzyh7p2BodSAgHyR_pg8c0kIsskxCeYdcgYEzVhwzcW2j1EIlhAdo5ecxPql_zTmqrJEQ/exec"; // e.g., https://script.google.com/macros/s/XXX/exec
 
 // teacher list (keep in sync with backend)
 const TEACHERS = [
