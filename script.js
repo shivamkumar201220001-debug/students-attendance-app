@@ -1,4 +1,4 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzwFLHCf2aDMv7T35purGRELT9LC5mEpzN7KhiWCAmf_KIih6FjSOsgmmZBcwxQWvUhJQ/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx4awT7W-YMzdceQlBpabyKEBFagUNM8SWGB_VqF0TsJp4nC0TVOxBDUgYhyGASlBLtTQ/exec";
 
 async function loadStudents() {
   const className = document.getElementById("classSelect").value;
