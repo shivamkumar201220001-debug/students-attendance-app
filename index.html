@@ -1,68 +1,50 @@
 <!doctype html>
-<html lang="en">
+<html>
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Students Attendance</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app">
-    <header class="topbar">
-      <h1>Students Attendance</h1>
-    </header>
+  <div class="container">
+    <h1>Students Attendance</h1>
 
-    <section class="card">
-      <div class="row">
-        <label for="teacherSelect">Teacher</label>
-        <select id="teacherSelect"></select>
-      </div>
+    <label>Teacher:</label>
+    <select id="teacherSelect">
+      <option value="Shivam">Shivam</option>
+      <option value="Soniya">Soniya</option>
+      <option value="Arun">Arun</option>
+      <option value="Pankaj">Pankaj</option>
+      <!-- baki 11 teacher yahan add karo -->
+    </select>
 
-      <div class="row">
-        <label for="classSelect">Class</label>
-        <select id="classSelect">
-          <option value="" disabled selected>Loading…</option>
-        </select>
-      </div>
+    <label>Date:</label>
+    <input type="date" id="dateSelect" />
 
-      <div class="row">
-        <label for="dateInput">Date</label>
-        <input id="dateInput" type="date" />
-      </div>
+    <label>Class:</label>
+    <select id="classSelect">
+      <option value="8th">8th</option>
+      <option value="9th 1st">9th 1st</option>
+      <option value="10th 1st">10th 1st</option>
+      <!-- baki class bhi add karna -->
+    </select>
 
-      <div class="actions">
-        <button id="loadBtn">Load Students</button>
-      </div>
-    </section>
+    <button onclick="loadStudents()">Load Students</button>
 
-    <section id="tableCard" class="card hidden">
-      <div class="tableHead">
-        <div class="meta">
-          <span id="metaTeacher"></span>
-          <span id="metaClass"></span>
-          <span id="metaDate"></span>
-        </div>
-        <button id="saveBtn">Save Attendance</button>
-      </div>
+    <table id="studentsTable">
+      <thead>
+        <tr>
+          <th>Reg No</th>
+          <th>Name</th>
+          <th>Class</th>
+          <th>Attendance</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
 
-      <div class="tableWrap">
-        <table id="studentsTable">
-          <thead>
-            <tr>
-              <th>Reg No</th>
-              <th>Name</th>
-              <th>Class</th>
-              <th>Attendance</th>
-            </tr>
-          </thead>
-          <tbody id="studentsBody"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <footer class="foot">© StepSwag Institute</footer>
+    <button onclick="saveAll()">Save Attendance</button>
   </div>
-
   <script src="script.js"></script>
 </body>
 </html>
