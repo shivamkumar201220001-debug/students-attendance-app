@@ -1,4 +1,4 @@
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzwFLHCf2aDMv7T35purGRELT9LC5mEpzN7KhiWCAmf_KIih6FjSOsgmmZBcwxQWvUhJQ/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw3HSm_fFUXnWUvKxLMyyvuiFz5aCVnK_G7_awQRc7Yki3XK_M5Y1vo5GD75MUg0LdXNg/exec";
 
 function loadStudents() {
   const tbody = document.querySelector("#studentsTable tbody");
