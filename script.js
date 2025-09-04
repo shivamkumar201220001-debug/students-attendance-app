@@ -3,17 +3,7 @@ const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw3HSm_fFUXnWUvKxLM
 function loadStudents() {
   const tbody = document.querySelector("#studentsTable tbody");
   tbody.innerHTML = "";
-
-  // Ye student list Google Sheet se fetch karni hogi
-  // Abhi example ke liye static data
-  const students = [
-    { regNo: "22510060", name: "Chitresh", class: "8th" },
-    { regNo: "22669121", name: "Shreya", class: "8th" },
-    { regNo: "22665706", name: "Ashwika", class: "8th" },
-    { regNo: "22557380", name: "Krish", class: "8th" },
-  ];
-
-  students.forEach(st => {
+students.forEach(st => {
     const row = document.createElement("tr");
     row.innerHTML = `
       <td>${st.regNo}</td>
